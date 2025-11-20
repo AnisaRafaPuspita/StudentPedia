@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+//use App\Http\Controllers\Auth\SellerRegisteredUserController;
+use App\Models\Regency;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,5 +29,27 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::middleware(['auth', 'role:seller'])->group(function() {
+    Route::get('/seller/dashboard', function () {
+        return view('seller.dashboard');
+    })->name('seller.dashboard');
+});
+
+
+//Route::get('/seller/register', [SellerRegisteredUserController::class, 'create'])
+    //->name('seller.register');
+
+    
+
+Route::get('/get-regencies/{province_id}', function ($province_id) {
+    return Regency::where('province_id', $province_id)->get();
+});
+
+Route::get('/regencies/{province_id}', function ($province_id) {
+    return \App\Models\Regency::where('province_id', $province_id)->get();
+});
+
+
 
 require __DIR__.'/auth.php';

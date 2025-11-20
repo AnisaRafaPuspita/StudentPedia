@@ -12,27 +12,28 @@ class Seller extends Model
     protected $table = 'sellers';
 
     protected $fillable = [
+        'user_id',
         'nama_toko',
-        'nama_pemilik',
+        'deskripsi_singkat',
+        'nama_pic',
         'email',
         'no_hp',
-        'alamat',
-        'province_id',
+        'alamat_jalan',
+        'rt',
+        'rw',
+        'kelurahan',
         'regency_id',
+        'province_id',
+        'no_ktp_pic',
+        'foto_pic',
+        'file_ktp_pic',
         'status_verifikasi',
-        'email_verified_at',
-        'password',
     ];
 
-    protected $hidden = [
-        'password',
-    ];
-
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
-
-    // ================= RELATIONSHIPS =================
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function province()
     {
@@ -42,10 +43,5 @@ class Seller extends Model
     public function regency()
     {
         return $this->belongsTo(Regency::class, 'regency_id');
-    }
-
-    public function products()
-    {
-        return $this->hasMany(Product::class, 'seller_id');
     }
 }
