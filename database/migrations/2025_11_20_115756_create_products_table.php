@@ -10,12 +10,22 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::create('products', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
-    }
+{
+    Schema::create('products', function (Blueprint $table) {
+        $table->id();
+        $table->unsignedBigInteger('seller_id');
+        $table->unsignedBigInteger('category_id')->nullable();
+        $table->string('nama_produk');
+        $table->text('deskripsi')->nullable();
+        $table->integer('harga');
+        $table->integer('stok');
+        $table->string('gambar')->nullable(); // path gambar di storage
+
+        $table->timestamps();
+
+    });
+}
+
 
     /**
      * Reverse the migrations.

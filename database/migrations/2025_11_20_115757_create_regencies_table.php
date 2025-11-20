@@ -13,7 +13,15 @@ return new class extends Migration
     {
         Schema::create('regencies', function (Blueprint $table) {
             $table->id();
+
+            $table->unsignedBigInteger('province_id');
+            $table->string('nama');
+
             $table->timestamps();
+
+            $table->foreign('province_id')
+                  ->references('id')->on('provinces')
+                  ->onDelete('cascade');
         });
     }
 
