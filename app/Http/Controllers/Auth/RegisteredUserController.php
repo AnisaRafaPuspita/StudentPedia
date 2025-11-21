@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use App\Providers\RouteServiceProvider;
+
 
 class RegisteredUserController extends Controller
 {
@@ -33,6 +35,7 @@ class RegisteredUserController extends Controller
         // ============================
         // VALIDASI FORM REGISTRASI
         // ============================
+        //dd("STORE MASUK", $request->all());
         $request->validate([
             // User account
             'name' => 'required|string|max:255',
@@ -91,14 +94,15 @@ class RegisteredUserController extends Controller
         // ============================
         // 3. CREATE SELLER DATA
         // ============================
-        Seller::create([
+        $seller = Seller::create([
+            
             'user_id' => $user->id,
 
             'nama_toko' => $request->nama_toko,
             'deskripsi_singkat' => $request->deskripsi_singkat,
 
             'nama_pic' => $request->nama_pic,
-            'email' => $request->email_pic, // email PIC
+            'email_pic' => $request->email_pic, // email PIC
             'no_hp' => $request->no_hp,
 
             'alamat_jalan' => $request->alamat_jalan,
@@ -112,8 +116,10 @@ class RegisteredUserController extends Controller
             'foto_pic' => $foto_pic_path,
             'file_ktp_pic' => $file_ktp_pic_path,
 
-            //'status_verifikasi' => 'pending',
+            'status_verifikasi' => 'pending',
         ]);
+        dd("SELLER CREATED?", $seller);
+
 
         // ============================
         // 4. LOGIN USER
@@ -123,6 +129,7 @@ class RegisteredUserController extends Controller
         // ============================
         // 5. REDIRECT SELLER DASHBOARD
         // ============================
-        return redirect()->route('seller.dashboard');
+        //return redirect()->route('seller.dashboard');
+        return redirect(RouteServiceProvider::HOME);
     }
 }

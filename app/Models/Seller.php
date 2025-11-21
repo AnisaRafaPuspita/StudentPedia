@@ -16,7 +16,7 @@ class Seller extends Model
         'nama_toko',
         'deskripsi_singkat',
         'nama_pic',
-        'email',
+        'email_pic',
         'no_hp',
         'alamat_jalan',
         'rt',
