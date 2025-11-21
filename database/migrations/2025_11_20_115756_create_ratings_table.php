@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('ratings', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        $table->id();
+        $table->unsignedBigInteger('product_id');
+        $table->unsignedBigInteger('user_id')->nullable();
+        $table->integer('rating');
+        $table->text('komentar')->nullable();
+        $table->timestamps();
         });
     }
 
