@@ -3,10 +3,10 @@
         <h2 class="font-semibold text-xl">Hasil Pencarian</h2>
     </x-slot>
 
-    <div class="max-w-4xl mx-auto mt-6">
+    <div class="max-w-6xl mx-auto mt-10">
 
-        <!-- FILTER SECTION -->
-        <div class="bg-white shadow rounded-lg p-4 mb-4">
+        {{-- FILTER --}}
+        <div class="bg-white shadow rounded-lg p-4 mb-5">
             <form action="{{ route('search.results') }}" method="GET" class="flex flex-wrap gap-4">
 
                 <input type="hidden" name="query" value="{{ request('query') }}">
@@ -29,30 +29,43 @@
                 <button class="px-4 py-2 bg-[#D90368] text-white rounded">
                     Terapkan
                 </button>
-
             </form>
         </div>
 
-        <!-- HASIL -->
-        <h3 class="text-gray-700 mb-4">Hasil untuk: <b>{{ $keyword }}</b></h3>
+        <h3 class="text-gray-700 mb-4">Hasil pencarian untuk: <b>{{ $keyword }}</b></h3>
 
-        @if($result->count())
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                @foreach ($result as $item)
-                    <div class="p-4 border rounded shadow hover:shadow-lg transition bg-white">
-                        <h3 class="font-bold text-lg">{{ $item->nama_produk }}</h3>
-                        <p class="text-sm text-gray-600">{{ Str::limit($item->deskripsi, 80) }}</p>
-                        <p class="text-[#D90368] font-bold mt-2">
-                            Rp {{ number_format($item->harga, 0, ',', '.') }}
-                        </p>
-                        <p class="text-xs text-gray-500">Stok: {{ $item->stok }}</p>
+        {{-- GRID PRODUK (SAMA PERSIS KATALOG) --}}
+        <div class="grid grid-cols-4 gap-6">
+
+            @forelse ($products as $product)
+                <div class="bg-white p-3 rounded-xl shadow border border-gray-200">
+
+                    {{-- GAMBAR PRODUK --}}
+                    <div class="w-full h-40 rounded-lg overflow-hidden bg-gray-100">
+                        <img src="{{ asset('storage/products/' . ($product->gambar ?? 'default.png')) }}"
+                             class="w-full h-full object-cover">
                     </div>
-                @endforeach
-            </div>
-        @else
-            <p class="text-gray-600">Tidak ada data ditemukan.</p>
-        @endif
+
+                    {{-- NAMA PRODUK --}}
+                    <p class="font-semibold text-sm mt-3 leading-tight">
+                        {{ $product->nama_produk }}
+                    </p>
+
+                    {{-- HARGA --}}
+                    <p class="text-pink-700 font-bold text-sm mt-1">
+                        Rp{{ number_format($product->harga, 0, ',', '.') }}
+                    </p>
+
+                    {{-- RATING --}}
+                    <p class="text-xs text-gray-600 mt-1">
+                        ⭐ {{ $product->average_rating ?? '5.0' }}
+                    </p>
+
+                </div>
+            @empty
+                <p class="text-gray-600">Tidak ada produk ditemukan.</p>
+            @endforelse
+        </div>
 
     </div>
-
 </x-app-layout>

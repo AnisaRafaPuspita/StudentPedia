@@ -2,7 +2,13 @@
 
 @section('content')
 
-<div class="max-w-6xl mx-auto mt-10">
+<div class="max-w-6xl mx-auto mt-10 pb-20">
+
+    @if(!empty($from_search))
+        <h2 class="text-white text-xl mt-4">
+            Hasil pencarian untuk: <b>{{ $keyword }}</b>
+        </h2>
+    @endif
 
     {{-- GRID PRODUK --}}
     <div class="grid grid-cols-4 gap-6">

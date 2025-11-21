@@ -4,27 +4,66 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
-// use App\Models\Student;
 
 class SearchController extends Controller
 {
-    public function index()
-    {
-        return view('search');
-    }
-
     public function results(Request $request)
     {
-        $keyword = $request->query('query');
+        $keyword  = $request->query('query');
+        $category = $request->query('category');
+        $harga    = $request->query('harga');
+        $toko     = $request->query('toko');
+        $provinsi = $request->query('province');
+        $regency  = $request->query('regency');
 
-        $results = Product::where('nama_produk', 'like', "%$keyword%")
-            ->orWhere('deskripsi', 'like', "%$keyword%")
-            ->get();
+        // MULAI QUERY
+        $products = Product::with(['seller.province', 'seller.regency']);
 
-        return view('result', [
-            'result' => $results,
-            'keyword' => $keyword
+        // Keyword
+        if ($keyword) {
+            $products->where(function ($q) use ($keyword) {
+                $q->where('nama_produk', 'like', "%$keyword%");
+            });
+        }
+
+        // Kategori
+        if ($category) {
+            $products->where('category_id', $category);
+        }
+
+        // Nama toko
+        if ($toko) {
+            $products->whereHas('seller', function ($q) use ($toko) {
+                $q->where('nama_toko', 'like', "%$toko%");
+            });
+        }
+
+        // Provinsi
+        if ($provinsi) {
+            $products->whereHas('seller', function ($q) use ($provinsi) {
+                $q->where('province_kode', $provinsi);
+            });
+        }
+
+        // Kabupaten
+        if ($regency) {
+            $products->whereHas('seller', function ($q) use ($regency) {
+                $q->where('regency_kode', $regency);
+            });
+        }
+
+        // AMBIL DATA
+        $products = $products->get();
+
+        return view('catalog.index', [
+            'products'    => $products,
+            'keyword'     => $keyword,
+            'from_search' => true
         ]);
     }
 
+    public function index()
+    {
+        return redirect()->route('search.results');
+    }
 }

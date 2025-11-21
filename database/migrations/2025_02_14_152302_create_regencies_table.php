@@ -6,28 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('regencies', function (Blueprint $table) {
-            $table->id();
-
-            $table->unsignedBigInteger('province_id');
-            $table->string('nama');
-
+            $table->string('kode', 13)->primary();
+            $table->string('province_kode', 10);
+            $table->string('nama', 100);
             $table->timestamps();
 
-            $table->foreign('province_id')
-                  ->references('id')->on('provinces')
-                  ->onDelete('cascade');
+            $table->foreign('province_kode')
+                ->references('kode')
+                ->on('provinces')
+                ->onDelete('cascade');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('regencies');

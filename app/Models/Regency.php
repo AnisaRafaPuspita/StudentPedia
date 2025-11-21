@@ -2,27 +2,25 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Regency extends Model
 {
-    use HasFactory;
-
     protected $table = 'regencies';
 
-    protected $fillable = [
-        'province_id',
-        'nama',
-    ];
+    protected $primaryKey = 'kode';
+    public $incrementing = false;
+    protected $keyType = 'string';
+
+    protected $fillable = ['kode', 'province_kode', 'nama'];
 
     public function province()
     {
-        return $this->belongsTo(Province::class, 'province_id');
+        return $this->belongsTo(Province::class, 'province_kode', 'kode');
     }
 
-    public function sellers()
+    public function districts()
     {
-        return $this->hasMany(Seller::class, 'regency_id');
+        return $this->hasMany(District::class, 'regency_kode', 'kode');
     }
 }

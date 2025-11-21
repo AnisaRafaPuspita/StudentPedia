@@ -4,12 +4,21 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\catalog\CatalogController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
+use App\Models\Regency;
+use App\Http\Controllers\WilayahController;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
 */
+
+
+Route::get('/wilayah/provinsi', [WilayahController::class, 'provinsi']);
+Route::get('/wilayah/kabupaten/{kode}', [WilayahController::class, 'kabupaten']);
+Route::get('/wilayah/kecamatan/{kode}', [WilayahController::class, 'kecamatan']);
+Route::get('/wilayah/kelurahan/{kode}', [WilayahController::class, 'kelurahan']);
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -31,7 +40,9 @@ Route::middleware('auth')->group(function () {
 });
 
 // Search routes
-Route::get('/search', [SearchController::class, 'index'])->name('search');
+Route::get('/search', [SearchController::class, 'results'])->name('search');
 Route::get('/search/results', [SearchController::class, 'results'])->name('search.results');
+
+
 
 require __DIR__.'/auth.php';
