@@ -99,7 +99,7 @@
 
         <div class="mt-4">
             <x-input-label value="Provinsi" />
-            <select name="province_id" class="w-full border-gray-300 rounded-md" required>
+            <select id="province_id" name="province_id" class="w-full border-gray-300 rounded-md" required>
                 <option value="">-- Pilih Provinsi --</option>
                 @foreach($provinces as $province)
                     <option value="{{ $province->id }}">{{ $province->Name }}</option>
@@ -109,13 +109,22 @@
 
         <div class="mt-4">
             <x-input-label value="Kabupaten/Kota" />
-            <select name="regency_id" class="w-full border-gray-300 rounded-md" required>
+            <select id="regency_id" name="regency_id" class="w-full border-gray-300 rounded-md" required>
                 <option value="">-- Pilih Kabupaten/Kota --</option>
                 @foreach($regencies as $regency)
                     <option value="{{ $regency->id }}">{{ $regency->name }}</option>
                 @endforeach
             </select>
         </div>
+
+
+        <div class="mt-4">
+            <x-input-label value="Kecamatan" />
+            <select id="district_id" name="district_id" class="w-full border-gray-300 rounded-md" required>
+                <option value="">-- Pilih Kecamatan --</option>
+            </select>
+        </div>
+
 
         <h2 class="text-lg font-semibold mt-6">KTP & Foto</h2>
 
@@ -151,5 +160,25 @@
             </ul>
         </div>
     @endif
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $('#regency_id').on('change', function() {
+            let regencyID = $(this).val();
+            $('#district_id').html('<option value="">Loading...</option>');
+
+            if (regencyID) {
+                $.get('/get-districts/' + regencyID, function(data) {
+                    let options = '<option value="">-- Pilih Kecamatan --</option>';
+                    data.forEach(function(d) {
+                        options += `<option value="${d.id}">${d.name}</option>`;
+                    });
+                    $('#district_id').html(options);
+                });
+            }
+        });
+    </script>
+
 
 </x-guest-layout>

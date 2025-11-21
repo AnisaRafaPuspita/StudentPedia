@@ -24,6 +24,7 @@ class Seller extends Model
         'kelurahan',
         'regency_id',
         'province_id',
+        'district_id',
         'no_ktp_pic',
         'foto_pic',
         'file_ktp_pic',
@@ -43,5 +44,10 @@ class Seller extends Model
     public function regency()
     {
         return $this->belongsTo(Regency::class, 'regency_id');
+    }
+
+    public function district()
+    {
+        return $this->belongsTo(District::class);
     }
 }

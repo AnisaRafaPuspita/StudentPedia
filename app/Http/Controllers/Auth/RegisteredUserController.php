@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 use App\Providers\RouteServiceProvider;
+use App\Models\District;
+
 
 
 class RegisteredUserController extends Controller
@@ -132,4 +134,15 @@ class RegisteredUserController extends Controller
         //return redirect()->route('seller.dashboard');
         return redirect(RouteServiceProvider::HOME);
     }
+
+    public function getRegencies($province_id)
+    {
+        return Regency::where('province_id', $province_id)->get();
+    }
+
+    public function getDistricts($regency_id)
+    {
+        return District::where('regency_id', $regency_id)->get();
+    }
+
 }
