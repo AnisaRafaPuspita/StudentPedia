@@ -36,6 +36,7 @@ class SellerSeeder extends Seeder
             $kab = $kabupatenList[array_rand($kabupatenList)] ?? null;
 
             DB::table('sellers')->insert([
+                'id'             => $i,
                 'nama_toko'       => $store['nama_toko'] . " $i",
                 'nama_pemilik'    => $store['pemilik'],
                 'email'           => "seller{$i}_" . uniqid() . "@gmail.com",
@@ -48,6 +49,7 @@ class SellerSeeder extends Seeder
                 'created_at'      => now(),
                 'updated_at'      => now(),
             ]);
+
         }
     }
 }

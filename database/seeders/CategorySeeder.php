@@ -15,7 +15,6 @@ class CategorySeeder extends Seeder
             ['nama' => 'Kecantikan'],
             ['nama' => 'Rumah Tangga'],
             ['nama' => 'Olahraga'],
-            ['nama' => 'Makanan & Minuman'],
         ];
 
         DB::table('categories')->insert($categories);
