@@ -4,6 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Seller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SellerApprovedMail;
+use App\Mail\SellerRejectedMail;
+
+
+
+
 
 class PlatformSellerController extends Controller
 {
@@ -20,10 +27,11 @@ class PlatformSellerController extends Controller
             'status_verifikasi' => 'approved',
         ]);
 
-        // TODO: email approved
+        Mail::to($seller->email_pic)->send(new SellerApprovedMail($seller));
 
         return redirect()->back()->with('status', 'Seller berhasil di-approve.');
     }
+
 
     public function reject(Seller $seller)
     {
@@ -31,8 +39,9 @@ class PlatformSellerController extends Controller
             'status_verifikasi' => 'rejected',
         ]);
 
-        // TODO: email rejected
+        Mail::to($seller->email_pic)->send(new SellerRejectedMail($seller));
 
         return redirect()->back()->with('status', 'Seller berhasil di-reject.');
     }
+
 }

@@ -10,6 +10,11 @@ use App\Http\Controllers\SellerStatusController;
 use App\Http\Controllers\PlatformSellerController;
 
 
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SellerApprovedMail;
+use App\Models\Seller;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -63,6 +68,14 @@ Route::middleware(['auth'])
         Route::post('/sellers/{seller}/reject', [PlatformSellerController::class, 'reject'])
             ->name('sellers.reject');
     });
+
+Route::get('/test-email', function () {
+    $seller = \App\Models\Seller::latest()->first(); // ambil seller terakhir
+
+    Mail::to($seller->email_pic)->send(new SellerApprovedMail($seller));
+
+    return 'Email test dikirim ke ' . $seller->email_pic;
+});
 
 
 //Route::get('/get-regencies/{province_id}', [RegisteredUserController::class, 'getRegencies']);
