@@ -125,7 +125,7 @@ class RegisteredUserController extends Controller
 
             'status_verifikasi' => 'pending',
         ]);
-        dd("SELLER CREATED?", $seller);
+        //dd("SELLER CREATED?", $seller);
 
 
         // ============================
@@ -137,7 +137,7 @@ class RegisteredUserController extends Controller
         // 5. REDIRECT SELLER DASHBOARD
         // ============================
         //return redirect()->route('seller.dashboard');
-        return redirect(RouteServiceProvider::HOME);
+        return redirect()->route('seller.pending');
     }
 
     public function getRegencies($province_id)
