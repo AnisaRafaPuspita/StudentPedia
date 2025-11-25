@@ -13,12 +13,17 @@ class Regency extends Model
 
     protected $fillable = [
         'province_id',
-        'nama',
+        'name',   // <-- di DB namanya "name"
     ];
 
     public function province()
     {
         return $this->belongsTo(Province::class, 'province_id');
+    }
+
+    public function districts()
+    {
+        return $this->hasMany(District::class, 'regency_id');
     }
 
     public function sellers()

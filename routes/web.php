@@ -61,6 +61,7 @@ Route::get('/regencies/{province_id}', function ($province_id) {
 
 Route::get('/get-regencies/{province_id}', [LocationController::class, 'getRegencies']);
 Route::get('/get-districts/{regency_id}', [LocationController::class, 'getDistricts']);
+Route::get('/get-villages/{district_id}', [LocationController::class, 'getVillages']); // <-- baru
 
 //Route::get('/get-districts/{regency_id}', [RegisteredUserController::class, 'getDistricts']);
 

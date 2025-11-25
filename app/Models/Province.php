@@ -11,8 +11,9 @@ class Province extends Model
 
     protected $table = 'provinces';
 
+    // pakai kolom "name" (bukan "nama")
     protected $fillable = [
-        'nama',
+        'name',
     ];
 
     public function regencies()

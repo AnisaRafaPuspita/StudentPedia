@@ -23,14 +23,15 @@ class RegisteredUserController extends Controller
 {
     public function create(): View
     {
-        $provinces = \App\Models\Province::all();
-        $regencies = \App\Models\Regency::all();
+        // Ambil hanya provinsi di Pulau Jawa
+        $provinces = Province::whereIn('id', [31, 32, 33, 34, 35, 36])
+            ->orderBy('name')   // kalau nama kolom di tabel kamu "Name", ganti jadi 'Name'
+            ->get();
 
-        return view('auth.register', [
-            'provinces' => Province::all(),
-            'regencies' => Regency::all(),
-        ]);
+        // Kita TIDAK perlu kirim $regencies lagi, karena akan di-load via AJAX
+        return view('auth.register', compact('provinces'));
     }
+
 
     public function store(Request $request): RedirectResponse
     {
@@ -59,6 +60,8 @@ class RegisteredUserController extends Controller
             'kelurahan' => 'required|string|max:255',
             'province_id' => 'required|integer',
             'regency_id' => 'required|integer',
+            'district_id' => 'required|exists:districts,id',
+
 
             // Dokumen
             'no_ktp_pic' => 'required|string|max:20',
@@ -113,6 +116,8 @@ class RegisteredUserController extends Controller
             'kelurahan' => $request->kelurahan,
             'province_id' => $request->province_id,
             'regency_id' => $request->regency_id,
+            'district_id' => $request->district_id,
+
 
             'no_ktp_pic' => $request->no_ktp_pic,
             'foto_pic' => $foto_pic_path,
