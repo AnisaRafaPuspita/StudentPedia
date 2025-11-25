@@ -7,6 +7,7 @@ use App\Models\Regency;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\SellerStatusController;
+use App\Http\Controllers\PlatformSellerController;
 
 
 
@@ -45,6 +46,24 @@ Route::middleware(['auth', 'role:seller'])->group(function() {
         return view('seller.dashboard');
     })->name('seller.dashboard');
 });
+
+
+
+
+Route::middleware(['auth'])
+    ->prefix('platform')   // <-- ganti admin jadi platform
+    ->name('platform.')
+    ->group(function () {
+        Route::get('/sellers', [PlatformSellerController::class, 'index'])
+            ->name('sellers.index');
+
+        Route::post('/sellers/{seller}/approve', [PlatformSellerController::class, 'approve'])
+            ->name('sellers.approve');
+
+        Route::post('/sellers/{seller}/reject', [PlatformSellerController::class, 'reject'])
+            ->name('sellers.reject');
+    });
+
 
 //Route::get('/get-regencies/{province_id}', [RegisteredUserController::class, 'getRegencies']);
 //Route::get('/get-districts/{regency_id}', [RegisteredUserController::class, 'getDistricts']);
