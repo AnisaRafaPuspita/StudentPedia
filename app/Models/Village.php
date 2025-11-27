@@ -8,13 +8,14 @@ class Village extends Model
 {
     protected $table = 'villages';
 
-    protected $fillable = [
-        'district_id',
-        'name',
-    ];
+    protected $primaryKey = 'kode';
+    public $incrementing = false;
+    protected $keyType = 'string';
+
+    protected $fillable = ['kode', 'district_kode', 'nama'];
 
     public function district()
     {
-        return $this->belongsTo(District::class);
+        return $this->belongsTo(District::class, 'district_kode', 'kode');
     }
 }

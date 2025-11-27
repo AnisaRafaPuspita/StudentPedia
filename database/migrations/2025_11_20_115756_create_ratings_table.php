@@ -13,6 +13,15 @@ return new class extends Migration
     {
         Schema::create('ratings', function (Blueprint $table) {
             $table->id();
+
+            // Foreign key ke tabel products
+            $table->unsignedBigInteger('product_id');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+
+            $table->string('nama_pengunjung');
+            $table->text('komentar')->nullable();
+            $table->tinyInteger('rating'); // 1–5
+
             $table->timestamps();
         });
     }

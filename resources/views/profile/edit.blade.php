@@ -1,4 +1,7 @@
 <x-app-layout>
+
+    <
+
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Profile') }}
@@ -26,4 +29,14 @@
             </div>
         </div>
     </div>
+
+    
+
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button type="submit"
+            class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+            Logout
+        </button>
+    </form>
 </x-app-layout>

@@ -6,25 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('villages', function (Blueprint $table) {
-            $table->id();                 // sama seperti id di file SQL
-            $table->unsignedBigInteger('district_id');
-            $table->string('name');
-            $table->timestamps();         // boleh ada, isinya nanti NULL, nggak masalah
-});
-
+        // Tidak digunakan lagi.
+        // Tabel 'villages' sudah dibuat oleh 2025_02_14_152304_create_villages_table
+        // dengan struktur kode Kemendagri (kode, district_kode, nama).
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('villages');
+        //
     }
 };

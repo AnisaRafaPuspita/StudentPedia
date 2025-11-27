@@ -95,11 +95,10 @@
         {{-- PROVINSI --}}
         <div class="mt-4">
             <x-input-label value="Provinsi" />
-            <select id="province_id" name="province_id" class="w-full border-gray-300 rounded-md" required>
+            <select id="province_kode" name="province_kode" class="w-full border-gray-300 rounded-md" required>
                 <option value="">-- Pilih Provinsi --</option>
                 @foreach($provinces as $province)
-                    {{-- kalau kolom di DB kamu "Name", pakai $province->Name --}}
-                    <option value="{{ $province->id }}">{{ $province->name ?? $province->Name }}</option>
+                    <option value="{{ $province->kode }}">{{ $province->nama }}</option>
                 @endforeach
             </select>
         </div>
@@ -107,7 +106,7 @@
         {{-- KABUPATEN / KOTA (awal kosong, diisi pakai AJAX) --}}
         <div class="mt-4">
             <x-input-label value="Kabupaten/Kota" />
-            <select id="regency_id" name="regency_id" class="w-full border-gray-300 rounded-md" required>
+            <select id="regency_kode" name="regency_kode" class="w-full border-gray-300 rounded-md" required>
                 <option value="">-- Pilih Kabupaten/Kota --</option>
             </select>
         </div>
@@ -115,7 +114,7 @@
         {{-- KECAMATAN --}}
         <div class="mt-4">
             <x-input-label value="Kecamatan" />
-            <select id="district_id" name="district_id" class="w-full border-gray-300 rounded-md" required>
+            <select id="district_kode" name="district_kode" class="w-full border-gray-300 rounded-md" required>
                 <option value="">-- Pilih Kecamatan --</option>
             </select>
         </div>
@@ -127,6 +126,7 @@
                 <option value="">-- Pilih Kelurahan --</option>
             </select>
         </div>
+
 
         <h2 class="text-lg font-semibold mt-6">KTP & Foto</h2>
 
@@ -169,57 +169,59 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+
+
 <script>
     // Saat provinsi berubah -> load kabupaten
-    $('#province_id').on('change', function() {
-        let provinceID = $(this).val();
+    $('#province_kode').on('change', function() {
+        let provinceKode = $(this).val();
 
-        $('#regency_id').html('<option value="">-- Pilih Kabupaten/Kota --</option>');
-        $('#district_id').html('<option value="">-- Pilih Kecamatan --</option>');
+        $('#regency_kode').html('<option value="">-- Pilih Kabupaten/Kota --</option>');
+        $('#district_kode').html('<option value="">-- Pilih Kecamatan --</option>');
         $('#kelurahan').html('<option value="">-- Pilih Kelurahan --</option>');
 
-        if (provinceID) {
-            $('#regency_id').html('<option value="">Loading...</option>');
-            $.get('/get-regencies/' + provinceID, function(data) {
+        if (provinceKode) {
+            $('#regency_kode').html('<option value="">Loading...</option>');
+            $.get('/get-regencies/' + provinceKode, function(data) {
                 let options = '<option value="">-- Pilih Kabupaten/Kota --</option>';
                 data.forEach(function(r) {
-                    options += `<option value="${r.id}">${r.name}</option>`;
+                    options += `<option value="${r.kode}">${r.nama}</option>`;
                 });
-                $('#regency_id').html(options);
+                $('#regency_kode').html(options);
             });
         }
     });
 
     // Saat kabupaten berubah -> load kecamatan
-    $('#regency_id').on('change', function() {
-        let regencyID = $(this).val();
+    $('#regency_kode').on('change', function() {
+        let regencyKode = $(this).val();
 
-        $('#district_id').html('<option value="">-- Pilih Kecamatan --</option>');
+        $('#district_kode').html('<option value="">-- Pilih Kecamatan --</option>');
         $('#kelurahan').html('<option value="">-- Pilih Kelurahan --</option>');
 
-        if (regencyID) {
-            $('#district_id').html('<option value="">Loading...</option>');
-            $.get('/get-districts/' + regencyID, function(data) {
+        if (regencyKode) {
+            $('#district_kode').html('<option value="">Loading...</option>');
+            $.get('/get-districts/' + regencyKode, function(data) {
                 let options = '<option value="">-- Pilih Kecamatan --</option>';
                 data.forEach(function(d) {
-                    options += `<option value="${d.id}">${d.name}</option>`;
+                    options += `<option value="${d.kode}">${d.nama}</option>`;
                 });
-                $('#district_id').html(options);
+                $('#district_kode').html(options);
             });
         }
     });
 
     // Saat kecamatan berubah -> load kelurahan
-    $('#district_id').on('change', function() {
-        let districtID = $(this).val();
+    $('#district_kode').on('change', function() {
+        let districtKode = $(this).val();
         $('#kelurahan').html('<option value="">Loading...</option>');
 
-        if (districtID) {
-            $.get('/get-villages/' + districtID, function(data) {
+        if (districtKode) {
+            $.get('/get-villages/' + districtKode, function(data) {
                 let options = '<option value="">-- Pilih Kelurahan --</option>';
                 data.forEach(function(v) {
-                    // value kita pakai nama kelurahan, biar langsung masuk ke kolom "kelurahan" di tabel sellers
-                    options += `<option value="${v.name}">${v.name}</option>`;
+                    // value pakai nama kelurahan (masuk ke kolom "kelurahan" di tabel sellers)
+                    options += `<option value="${v.nama}">${v.nama}</option>`;
                 });
                 $('#kelurahan').html(options);
             });
@@ -228,6 +230,7 @@
         }
     });
 </script>
+
 
 
 </x-guest-layout>

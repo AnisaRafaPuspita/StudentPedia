@@ -8,15 +8,12 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('role')->default('seller')->after('email');
-        });
+        // Sudah tidak diperlukan.
+        // Kolom 'role' sudah dibuat langsung di create_users_table.
     }
 
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('role');
-        });
+        //
     }
 };

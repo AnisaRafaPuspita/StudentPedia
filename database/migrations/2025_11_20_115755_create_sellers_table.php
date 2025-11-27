@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::create('sellers', function (Blueprint $table) {
             $table->id();
+
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
 
             $table->string('nama_toko');
@@ -18,15 +19,18 @@ return new class extends Migration
             // Data PIC
             $table->string('nama_pic');
             $table->string('no_hp');
-            $table->string('email'); // Email PIC
+            $table->string('email_pic'); // sinkron dengan model & form
 
             // Alamat lengkap
             $table->string('alamat_jalan');
             $table->string('rt');
             $table->string('rw');
             $table->string('kelurahan');
-            $table->unsignedBigInteger('regency_id');
-            $table->unsignedBigInteger('province_id');
+
+            // Wilayah (pakai kode kemendagri)
+            $table->string('province_kode', 10)->nullable();
+            $table->string('regency_kode', 10)->nullable();
+            $table->string('district_kode', 10)->nullable();
 
             // Dokumen
             $table->string('no_ktp_pic');
@@ -34,7 +38,8 @@ return new class extends Migration
             $table->string('file_ktp_pic')->nullable();
 
             // Status sistem
-            $table->string('status_verifikasi')->default('pending'); // pending | approved | rejected
+            $table->enum('status_verifikasi', ['pending', 'approved', 'rejected'])
+                  ->default('pending');
 
             $table->timestamps();
         });

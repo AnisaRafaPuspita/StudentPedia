@@ -18,16 +18,20 @@ class Seller extends Model
         'nama_pic',
         'email_pic',
         'no_hp',
+
         'alamat_jalan',
         'rt',
         'rw',
         'kelurahan',
-        'regency_id',
-        'province_id',
-        'district_id',
+
+        'province_kode',
+        'regency_kode',
+        'district_kode',
+
         'no_ktp_pic',
         'foto_pic',
         'file_ktp_pic',
+
         'status_verifikasi',
     ];
 
@@ -38,16 +42,16 @@ class Seller extends Model
 
     public function province()
     {
-        return $this->belongsTo(Province::class, 'province_id');
+        return $this->belongsTo(Province::class, 'province_kode', 'kode');
     }
 
     public function regency()
     {
-        return $this->belongsTo(Regency::class, 'regency_id');
+        return $this->belongsTo(Regency::class, 'regency_kode', 'kode');
     }
 
     public function district()
     {
-        return $this->belongsTo(District::class);
+        return $this->belongsTo(District::class, 'district_kode', 'kode');
     }
 }

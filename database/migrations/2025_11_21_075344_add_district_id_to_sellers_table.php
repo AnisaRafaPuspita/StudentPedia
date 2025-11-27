@@ -6,21 +6,14 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up()
+    public function up(): void
     {
-        Schema::table('sellers', function (Blueprint $table) {
-            $table->unsignedBigInteger('district_id')->after('regency_id');
-        });
+        // Sudah tidak dipakai lagi karena schema sellers baru
+        // sudah menggunakan province_kode, regency_kode, district_kode.
     }
 
-    public function down()
+    public function down(): void
     {
-        Schema::table('sellers', function (Blueprint $table) {
-            $table->dropColumn('district_id');
-        });
+        //
     }
-
 };
