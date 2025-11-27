@@ -54,7 +54,7 @@ Route::get('/search/results', [SearchController::class, 'results'])->name('searc
 Route::get('/product/{id}', [DetailProductController::class, 'show'])
     ->name('product.detailProduct');
 
-
+// ========= REVIEW ROUTE =========
 Route::get('/produk/{product}/komentar', [ProductReviewController::class, 'create'])
     ->name('reviews.create');
 
