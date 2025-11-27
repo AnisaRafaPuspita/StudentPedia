@@ -12,38 +12,45 @@ class WilayahSplitSeeder extends Seeder
         $wilayah = DB::table('wilayah')->orderBy('kode')->get();
 
         foreach ($wilayah as $w) {
-            $len = strlen($w->kode);
+
+            // hapus titik biar kodenya jadi angka semua
+            $kode = str_replace('.', '', $w->kode);
+            $len  = strlen($kode);
 
             if ($len === 2) {
                 DB::table('provinces')->updateOrInsert(
-                    ['kode' => $w->kode],
+                    ['kode' => $kode],
                     ['nama' => $w->nama]
                 );
-            } elseif ($len === 5) {
+
+            } elseif ($len === 4) {
                 DB::table('regencies')->updateOrInsert(
-                    ['kode' => $w->kode],
+                    ['kode' => $kode],
                     [
-                        'province_kode' => substr($w->kode, 0, 2),
+                        'province_kode' => substr($kode, 0, 2),
                         'nama'          => $w->nama,
                     ]
                 );
-            } elseif ($len === 8) {
+
+            } elseif ($len === 6) {
                 DB::table('districts')->updateOrInsert(
-                    ['kode' => $w->kode],
+                    ['kode' => $kode],
                     [
-                        'regency_kode' => substr($w->kode, 0, 5),
+                        'regency_kode' => substr($kode, 0, 4),
                         'nama'         => $w->nama,
                     ]
                 );
-            } elseif ($len === 13) {
+
+            } elseif ($len === 10) {
                 DB::table('villages')->updateOrInsert(
-                    ['kode' => $w->kode],
+                    ['kode' => $kode],
                     [
-                        'district_kode' => substr($w->kode, 0, 8),
+                        'district_kode' => substr($kode, 0, 6),
                         'nama'          => $w->nama,
                     ]
                 );
             }
         }
+
     }
 }

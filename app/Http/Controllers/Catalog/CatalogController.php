@@ -9,7 +9,7 @@ class CatalogController extends Controller
 {
     public function index()
     {
-        $products = Product::all();
+        $products = Product::with('mainImage')->get();
         return view('catalog.index', compact('products'));
     }
 }

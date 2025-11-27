@@ -63,7 +63,9 @@
 
                 </div>
             @empty
-                <p class="text-gray-600">Tidak ada produk ditemukan.</p>
+                <div class="col-span-4 bg-white/80 p-6 rounded-xl shadow text-center text-gray-700">
+                    Tidak ada produk ditemukan.
+                </div>
             @endforelse
         </div>
 
