@@ -17,12 +17,13 @@ class Seller extends Model
         'email',
         'no_hp',
         'alamat',
-        'province_id',
-        'regency_id',
+        'province_kode',
+        'regency_kode',
         'status_verifikasi',
         'email_verified_at',
         'password',
     ];
+
 
     protected $hidden = [
         'password',
@@ -36,13 +37,14 @@ class Seller extends Model
 
     public function province()
     {
-        return $this->belongsTo(Province::class, 'province_id');
+        return $this->belongsTo(Province::class, 'province_kode', 'kode');
     }
 
     public function regency()
     {
-        return $this->belongsTo(Regency::class, 'regency_id');
+        return $this->belongsTo(Regency::class, 'regency_kode', 'kode');
     }
+
 
     public function products()
     {

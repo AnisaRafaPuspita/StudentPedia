@@ -26,11 +26,10 @@ class Product extends Model
         'stok'  => 'integer',
     ];
 
-    // ================ RELATIONSHIPS ==================
-
+    // RELATIONSHIPS
     public function seller()
     {
-        return $this->belongsTo(Seller::class, 'seller_id');
+        return $this->belongsTo(Seller::class, 'seller_id'); // Atau User::class kalau seller = users
     }
 
     public function category()
@@ -43,13 +42,19 @@ class Product extends Model
         return $this->hasMany(Rating::class, 'product_id');
     }
 
-    // rata-rata rating (helper buat katalog / laporan)
     public function getAverageRatingAttribute()
     {
         if ($this->ratings()->count() === 0) {
             return null;
         }
-
         return round($this->ratings()->avg('rating'), 2);
+    }
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class);
+    }
+    public function mainImage()
+    {
+        return $this->hasOne(ProductImage::class)->latestOfMany();
     }
 }
