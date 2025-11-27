@@ -13,9 +13,15 @@ class ProductReviewController extends Controller
     public function create(Request $request, $productId)
     {
         // GUARD: kalau session biodata belum ada, lempar ke halaman visitor dulu
-        if (!session('visitor_name') || !session('visitor_phone') || !session('visitor_email')) {
+        // if (!session('visitor_name') || !session('visitor_phone') || !session('visitor_email')) {
             // return redirect()->route('visitor.form');
-        }
+        //}
+        session([
+            'visitor_name'  => session('visitor_name')  ?? 'Test User',
+            'visitor_phone' => session('visitor_phone') ?? '08123456789',
+            'visitor_email' => session('visitor_email') ?? 'test@gmail.com',
+        ]);
+
 
         // ambil biodata dari session
         $visitorName  = session('visitor_name');
@@ -87,7 +93,7 @@ class ProductReviewController extends Controller
     {
         return view('reviews.thanks', [
             'productId' => $productId,
-            'user' => session('user') ?? session('visitor_name') ?? '{user}',
+            'user' => session('user') ?? session('visitor_name') ?? 'test user',
         ]);
     }
 }
