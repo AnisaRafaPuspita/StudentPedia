@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProductReviewController;
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
@@ -53,5 +54,14 @@ Route::get('/search/results', [SearchController::class, 'results'])->name('searc
 Route::get('/product/{id}', [DetailProductController::class, 'show'])
     ->name('product.detailProduct');
 
+
+Route::get('/produk/{product}/komentar', [ProductReviewController::class, 'create'])
+    ->name('reviews.create');
+
+Route::post('/produk/{product}/komentar', [ProductReviewController::class, 'store'])
+    ->name('reviews.store');
+
+Route::get('/produk/{product}/komentar/sukses', [ProductReviewController::class, 'thanks'])
+    ->name('reviews.thanks');
 
 require __DIR__.'/auth.php';
