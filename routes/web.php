@@ -5,31 +5,43 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Seller\DashboardSellerController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\WilayahController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\SellerStatusController;
 use App\Http\Controllers\PlatformSellerController;
-
 use App\Http\Controllers\Catalog\CatalogController;
 use App\Http\Controllers\Catalog\DetailProductController;
 
 use App\Mail\SellerApprovedMail;
 use App\Models\Seller;
 
-// ========= ROUTE WILAYAH (dari temenmu) =========
+/*
+|--------------------------------------------------------------------------
+| ROUTE WILAYAH (dari temenmu)
+|--------------------------------------------------------------------------
+*/
 Route::get('/wilayah/provinsi', [WilayahController::class, 'provinsi']);
 Route::get('/wilayah/kabupaten/{kode}', [WilayahController::class, 'kabupaten']);
 Route::get('/wilayah/kecamatan/{kode}', [WilayahController::class, 'kecamatan']);
 Route::get('/wilayah/kelurahan/{kode}', [WilayahController::class, 'kelurahan']);
 
-// ========= ROUTE PUBLIC CATALOG =========
+/*
+|--------------------------------------------------------------------------
+| ROUTE PUBLIC CATALOG
+|--------------------------------------------------------------------------
+*/
 Route::get('/', [CatalogController::class, 'index'])->name('home');
 Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog');
 Route::get('/product/{id}', [DetailProductController::class, 'show'])->name('product.detailProduct');
 
-// ========= DASHBOARD (SETELAH LOGIN) =========
+/*
+|--------------------------------------------------------------------------
+| DASHBOARD (SETELAH LOGIN)
+|--------------------------------------------------------------------------
+*/
 Route::get('/dashboard', function () {
     $user = Auth::user();
 
@@ -60,7 +72,11 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// ========= ROUTE AUTH PROFIL =========
+/*
+|--------------------------------------------------------------------------
+| ROUTE AUTH PROFIL
+|--------------------------------------------------------------------------
+*/
 Route::middleware('auth')->group(function () {
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -69,20 +85,54 @@ Route::middleware('auth')->group(function () {
 
 });
 
-// ========= ROUTE SELLER STATUS =========
+/*
+|--------------------------------------------------------------------------
+| SELLER STATUS (PENDING PAGE)
+|--------------------------------------------------------------------------
+*/
 Route::middleware(['auth'])->group(function () {
     Route::get('/seller/pending', [SellerStatusController::class, 'pending'])
         ->name('seller.pending');
 });
 
-// ========= ROUTE DASHBOARD SELLER =========
-Route::middleware(['auth', 'role:seller'])->group(function() {
-    Route::get('/seller/dashboard', function () {
-        return view('seller.dashboard');
-    })->name('seller.dashboard');
+/*
+|--------------------------------------------------------------------------
+| DASHBOARD + CRUD PENJUAL (SELLER) – pakai DashboardSellerController
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:seller'])->group(function () {
+
+    // dashboard utama penjual
+    Route::get('/seller/dashboard', [DashboardSellerController::class, 'index'])
+        ->name('seller.dashboard');
+
+    // alias URL lain (kalau mau dipakai)
+    Route::get('/dashboardPenjual', [DashboardSellerController::class, 'index'])
+        ->name('seller.dashboardPenjual');
+
+    // CRUD produk
+    Route::post('/seller/products', [DashboardSellerController::class, 'store'])
+        ->name('seller.products.store');
+
+    Route::get('/seller/products/{id}/edit', [DashboardSellerController::class, 'edit'])
+        ->name('seller.products.edit');
+
+    Route::put('/seller/products/{id}', [DashboardSellerController::class, 'update'])
+        ->name('seller.products.update');
+
+    Route::delete('/seller/products/{id}', [DashboardSellerController::class, 'destroy'])
+        ->name('seller.products.destroy');
+
+    Route::get('/seller/products/create', [DashboardSellerController::class, 'create'])
+        ->name('seller.products.create');
+
 });
 
-// ========= ROUTE PLATFORM (ADMIN) =========
+/*
+|--------------------------------------------------------------------------
+| ROUTE PLATFORM (ADMIN / PLATFORM)
+|--------------------------------------------------------------------------
+*/
 Route::middleware(['auth', 'role:platform'])
     ->prefix('platform')
     ->name('platform.')
@@ -97,7 +147,11 @@ Route::middleware(['auth', 'role:platform'])
             ->name('sellers.reject');
     });
 
-// ========= ROUTE TEST EMAIL (opsional) =========
+/*
+|--------------------------------------------------------------------------
+| ROUTE TEST EMAIL (opsional)
+|--------------------------------------------------------------------------
+*/
 Route::get('/test-email', function () {
     $seller = \App\Models\Seller::latest()->first(); // ambil seller terakhir
 
@@ -106,19 +160,35 @@ Route::get('/test-email', function () {
     return 'Email test dikirim ke ' . $seller->email_pic;
 });
 
-// ========= ROUTE LOKASI UNTUK FORM REGISTER (JSON) =========
-// (nanti LocationController perlu disesuaikan ke kolom province_kode/regency_kode/district_kode)
+/*
+|--------------------------------------------------------------------------
+| ROUTE LOKASI UNTUK FORM REGISTER (JSON)
+|--------------------------------------------------------------------------
+*/
 Route::get('/get-regencies/{province_kode}', [LocationController::class, 'getRegencies']);
 Route::get('/get-districts/{regency_kode}', [LocationController::class, 'getDistricts']);
 Route::get('/get-villages/{district_kode}', [LocationController::class, 'getVillages']);
 
-// ========= SEARCH ROUTE (dari main) =========
+/*
+|--------------------------------------------------------------------------
+| SEARCH ROUTE
+|--------------------------------------------------------------------------
+*/
 Route::get('/search', [SearchController::class, 'results'])->name('search');
 Route::get('/search/results', [SearchController::class, 'results'])->name('search.results');
 
+/*
+|--------------------------------------------------------------------------
+| WELCOME PAGE (kalau mau dipakai terpisah)
+|--------------------------------------------------------------------------
+*/
 Route::get('/welcome', function () {
     return view('welcome');
 })->name('welcome');
 
-
+/*
+|--------------------------------------------------------------------------
+| AUTH ROUTES (login, register, dll)
+|--------------------------------------------------------------------------
+*/
 require __DIR__.'/auth.php';
