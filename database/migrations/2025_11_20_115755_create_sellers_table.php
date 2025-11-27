@@ -6,34 +6,45 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
-{
-    Schema::create('sellers', function (Blueprint $table) {
-        $table->id();
+    {
+        Schema::create('sellers', function (Blueprint $table) {
+            $table->id();
 
-        $table->string('nama_toko');
-        $table->string('nama_pemilik');
-        $table->string('email')->unique();
-        $table->string('no_hp')->nullable();
-        $table->text('alamat')->nullable();
-        $table->unsignedBigInteger('province_id')->nullable();
-        $table->unsignedBigInteger('regency_id')->nullable();
-        $table->enum('status_verifikasi', ['pending', 'verified', 'rejected'])->default('pending');
-        $table->timestamp('email_verified_at')->nullable();
-        $table->string('password');
-        $table->timestamps();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
 
-        
-    });
-}
+            $table->string('nama_toko');
+            $table->string('deskripsi_singkat')->nullable();
 
+            // Data PIC
+            $table->string('nama_pic');
+            $table->string('no_hp');
+            $table->string('email_pic'); // sinkron dengan model & form
 
-    /**
-     * Reverse the migrations.
-     */
+            // Alamat lengkap
+            $table->string('alamat_jalan');
+            $table->string('rt');
+            $table->string('rw');
+            $table->string('kelurahan');
+
+            // Wilayah (pakai kode kemendagri)
+            $table->string('province_kode', 10)->nullable();
+            $table->string('regency_kode', 10)->nullable();
+            $table->string('district_kode', 10)->nullable();
+
+            // Dokumen
+            $table->string('no_ktp_pic');
+            $table->string('foto_pic')->nullable();
+            $table->string('file_ktp_pic')->nullable();
+
+            // Status sistem
+            $table->enum('status_verifikasi', ['pending', 'approved', 'rejected'])
+                  ->default('pending');
+
+            $table->timestamps();
+        });
+    }
+
     public function down(): void
     {
         Schema::dropIfExists('sellers');

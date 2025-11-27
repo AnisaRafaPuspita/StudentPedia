@@ -10,20 +10,21 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('ratings', function (Blueprint $table) {
-        $table->id();
-        $table->unsignedBigInteger('product_id');
-        $table->string('nama_pengunjung');
-        $table->text('komentar')->nullable();
-        $table->integer('rating'); 
-        $table->timestamps();
-        $table->foreign('product_id')
-              ->references('id')->on('products')
-              ->onDelete('cascade');
-    });
-}
+    {
+        Schema::create('ratings', function (Blueprint $table) {
+            $table->id();
 
+            // Foreign key ke tabel products
+            $table->unsignedBigInteger('product_id');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+
+            $table->string('nama_pengunjung');
+            $table->text('komentar')->nullable();
+            $table->tinyInteger('rating'); // 1–5
+
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.

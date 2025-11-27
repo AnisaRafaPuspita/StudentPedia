@@ -58,4 +58,12 @@ class Product extends Model
         }
         return round($this->ratings()->avg('rating'), 2);
     }
+    /*public function images()
+    {
+        return $this->hasMany(ProductImage::class);
+    }*/
+    public function mainImage()
+    {
+        return $this->hasOne(ProductImage::class)->latestOfMany();
+    }
 }
