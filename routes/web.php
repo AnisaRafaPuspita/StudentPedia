@@ -17,7 +17,7 @@ use App\Http\Controllers\Catalog\DetailProductController;
 |--------------------------------------------------------------------------
 */
 
-// ========= ROUTE WILAYAH (dari temenmu) =========
+// ========= ROUTE WILAYAH 
 Route::get('/wilayah/provinsi', [WilayahController::class, 'provinsi']);
 Route::get('/wilayah/kabupaten/{kode}', [WilayahController::class, 'kabupaten']);
 Route::get('/wilayah/kecamatan/{kode}', [WilayahController::class, 'kecamatan']);
