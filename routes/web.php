@@ -14,6 +14,10 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\SellerApprovedMail;
 use App\Models\Seller;
 
+use Illuminate\Support\Facades\Auth;
+
+
+
 
 
 /*
@@ -32,8 +36,37 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
+    $user = Auth::user();
+
+    // Kalau platform → lempar ke halaman verifikasi seller
+    if ($user->role === 'platform') {
+        return redirect()->route('platform.sellers.index');
+    }
+
+    // Kalau seller → cek status verifikasi
+    $seller = Seller::where('user_id', $user->id)->first();
+
+    if ($seller) {
+        if ($seller->status_verifikasi === 'pending') {
+            return redirect()->route('seller.pending');
+        }
+
+        if ($seller->status_verifikasi === 'approved') {
+            return redirect()->route('seller.dashboard');
+        }
+
+        // optional: kalau rejected, bikin halaman sendiri
+        if ($seller->status_verifikasi === 'rejected') {
+            // nanti bisa ganti ke view khusus ditolak
+            return redirect()->route('seller.pending')
+                ->with('status', 'Pengajuan Anda ditolak.');
+        }
+    }
+
+    // fallback kalau bukan seller dan bukan platform
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -55,8 +88,8 @@ Route::middleware(['auth', 'role:seller'])->group(function() {
 
 
 
-Route::middleware(['auth'])
-    ->prefix('platform')   // <-- ganti admin jadi platform
+Route::middleware(['auth', 'role:platform'])   // <--- tambahkan role:platform
+    ->prefix('platform')
     ->name('platform.')
     ->group(function () {
         Route::get('/sellers', [PlatformSellerController::class, 'index'])
@@ -68,6 +101,7 @@ Route::middleware(['auth'])
         Route::post('/sellers/{seller}/reject', [PlatformSellerController::class, 'reject'])
             ->name('sellers.reject');
     });
+
 
 Route::get('/test-email', function () {
     $seller = \App\Models\Seller::latest()->first(); // ambil seller terakhir
