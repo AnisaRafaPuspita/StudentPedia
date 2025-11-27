@@ -12,28 +12,33 @@ class Seller extends Model
     protected $table = 'sellers';
 
     protected $fillable = [
+        'user_id',
         'nama_toko',
-        'nama_pemilik',
-        'email',
+        'deskripsi_singkat',
+        'nama_pic',
+        'email_pic',
         'no_hp',
-        'alamat',
+
+        'alamat_jalan',
+        'rt',
+        'rw',
+        'kelurahan',
+
         'province_kode',
         'regency_kode',
+        'district_kode',
+
+        'no_ktp_pic',
+        'foto_pic',
+        'file_ktp_pic',
+
         'status_verifikasi',
-        'email_verified_at',
-        'password',
     ];
 
-
-    protected $hidden = [
-        'password',
-    ];
-
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
-
-    // ================= RELATIONSHIPS =================
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function province()
     {
@@ -45,9 +50,8 @@ class Seller extends Model
         return $this->belongsTo(Regency::class, 'regency_kode', 'kode');
     }
 
-
-    public function products()
+    public function district()
     {
-        return $this->hasMany(Product::class, 'seller_id');
+        return $this->belongsTo(District::class, 'district_kode', 'kode');
     }
 }
