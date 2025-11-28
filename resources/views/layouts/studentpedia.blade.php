@@ -39,7 +39,8 @@
                     </a>
                 @else
                     {{-- Sudah login → ke dashboard (nanti diarahkan sesuai role: seller/platform) --}}
-                    <a href="{{ route('profile.edit') }}" class="p-2">
+                    <a href="{{ route('dashboard') }}" class="p-2">
+                        
                         <svg xmlns="http://www.w3.org/2000/svg"
                             class="w-8 h-8 text-white"
                             fill="none"

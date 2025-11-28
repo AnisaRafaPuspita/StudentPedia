@@ -22,9 +22,8 @@ class RegisteredUserController extends Controller
     public function create(): View
     {
         // Ambil hanya provinsi di Pulau Jawa (kode: 31–36) dari tabel provinces (kode, nama)
-        $provinces = Province::whereIn('kode', ['31', '32', '33', '34', '35', '36'])
-            ->orderBy('nama')
-            ->get();
+        $provinces = Province::select('kode', 'nama')->orderBy('nama')->get();
+
 
         // Regency & district nanti di-load via AJAX, jadi cukup kirim provinces
         return view('auth.register', compact('provinces'));
