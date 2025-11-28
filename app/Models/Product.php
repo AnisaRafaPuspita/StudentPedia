@@ -47,8 +47,13 @@ class Product extends Model
         if ($this->ratings()->count() === 0) {
             return null;
         }
-        return round($this->ratings()->avg('rating'), 2);
+        return round($this->ratings()->avg('rating')?? 0, 2);
     }
+    public function comments()
+    {
+        return $this->hasMany(Comment::class, 'product_id');
+    }
+
     public function images()
     {
         return $this->hasMany(ProductImage::class);

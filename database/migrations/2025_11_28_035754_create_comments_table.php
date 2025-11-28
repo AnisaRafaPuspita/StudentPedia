@@ -6,26 +6,25 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
-
-            $table->unsignedBigInteger('product_id');
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
-
-            $table->unsignedBigInteger('rating_id')->nullable();
-            $table->foreign('rating_id')->references('id')->on('ratings')->onDelete('cascade');
-
+            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
+            $table->foreignId('rating_id')->nullable()->constrained('ratings')->onDelete('cascade');
             $table->string('nama_pengunjung');
             $table->text('komentar');
-
+            $table->unsignedTinyInteger('rating'); // 1-5
             $table->timestamps();
-
-            
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('comments');

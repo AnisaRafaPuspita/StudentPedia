@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>Terima kasih</title>
-</head>
-<body style="font-family: Arial, sans-serif; line-height:1.6;">
-  <h2>Terima kasih, {{ $rating->name }}! 🎉</h2>
+<body>
+    <h2>Terima kasih, {{ $rating->nama_pengunjung }}! 🎉</h2>
 
-  <p>Komentar dan rating kamu sudah kami terima.</p>
+    <p>Kamu sudah memberi ulasan untuk produk:</p>
+    <b>{{ $product->nama_produk }}</b>
 
-  <p><strong>Rating:</strong> {{ $rating->rating }}/5</p>
-  <p><strong>Komentar:</strong><br>{{ $comment->comment }}</p>
+    <p>Rating: ⭐ {{ $rating->rating }}</p>
+    <p>Komentar: "{{ $comment->komentar }}"</p>
 
-  <hr>
-  <p style="font-size:12px;color:#777;">StudentPedia</p>
+    <br>
+    <p>Salam hangat,</p>
+    <p><b>StudentPedia</b></p>
 </body>
 </html>

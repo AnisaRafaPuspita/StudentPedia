@@ -5,6 +5,7 @@
     <title>StudentPedia</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
 <body class="bg-pink-600 min-h-screen flex flex-col">
 
@@ -35,37 +36,40 @@
             </a>
         </div>
     </header>
+    @if (!isset($hideSearch) || !$hideSearch)
+        {{-- SEARCH + FILTER WRAPPER --}}
+        <div class="mt-10 flex flex-col items-center">
 
-    {{-- SEARCH + FILTER WRAPPER --}}
-    <div class="mt-10 flex flex-col items-center">
+            <h2 class="text-white font-bold text-2xl mb-6">Mau cari apa hari ini?</h2>
 
-        <h2 class="text-white font-bold text-2xl mb-6">Mau cari apa hari ini?</h2>
+            <div class="flex items-center gap-4">
 
-        <div class="flex items-center gap-4">
+                {{-- FORM SEARCH --}}
+                <form action="{{ route('search.results') }}" method="GET" class="flex items-center gap-3">
 
-            {{-- FORM SEARCH --}}
-            <form action="{{ route('search.results') }}" method="GET" class="flex items-center gap-3">
+                    <div class="relative w-[600px]">
+                        <input type="text" name="query"
+                            value="{{ request('query') }}"
+                            placeholder="Cari Barang"
+                            class="w-full px-6 py-3 rounded-full bg-white text-gray-700
+                                    border border-[#F7B3D6]/60 
+                                    focus:border-[#F7B3D6]
+                                    focus:ring-2 focus:ring-[#F7B3D6]
+                                    outline-none shadow-sm transition-all duration-200" />
+                    </div>
 
-                <div class="relative w-[600px]">
-                    <input type="text" name="query"
-                        value="{{ request('query') }}"
-                        placeholder="Cari Barang"
-                        class="w-full px-6 py-3 rounded-full bg-white text-gray-700
-                                border border-[#F7B3D6]/60 
-                                focus:border-[#F7B3D6]
-                                focus:ring-2 focus:ring-[#F7B3D6]
-                                outline-none shadow-sm transition-all duration-200" />
-                </div>
+                    <button type="submit"
+                        class="flex items-center bg-pink-300 px-4 py-2 rounded-full shadow hover:bg-pink-500 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
+                </form>
+    
 
-                <button type="submit"
-                    class="flex items-center bg-pink-300 px-4 py-2 rounded-full shadow hover:bg-pink-500 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                        class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                </button>
-            </form>
+    
 
             {{-- FILTER --}}
             <div x-data="{ openFilter: false }" class="relative">
@@ -116,7 +120,7 @@
                     </form>
                 </div>
             </div>
-
+        @endif
         </div> {{-- END ROW --}}
 
     </div>

@@ -1,8 +1,8 @@
 @extends('layouts.studentpedia')
 
 @section('content')
-
-<style>
+<div x-data="{ openBiodata: false }">
+  <style>
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -28,10 +28,10 @@
     border-left: 14px solid white; /* segitiga kanan */
   }
   .thumb-triangle.left { transform: rotate(180deg); }
-</style>
+  </style>
 
 
-<div class="max-w-6xl mx-auto mt-10 grid grid-cols-12 gap-10">
+  <div class="max-w-6xl mx-auto mt-10 grid grid-cols-12 gap-10">
 
     {{-- FOTO PRODUK (Modern Gallery) --}}
     <div 
@@ -70,8 +70,8 @@
         <div
           x-ref="thumb"
           class="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory
-                 px-8 py-2 rounded-xl bg-white/70 backdrop-blur
-                 border border-white/60 shadow-sm no-scrollbar"
+                  px-8 py-2 rounded-xl bg-white/70 backdrop-blur
+                  border border-white/60 shadow-sm no-scrollbar"
         >
           @foreach ($product->images as $img)
             @php $url = asset('img/'.$img->path); @endphp
@@ -84,7 +84,7 @@
                           ? 'ring-2 ring-pink-500 border-pink-500'
                           : 'border-gray-200'"
                 class="w-20 h-20 rounded-xl object-cover cursor-pointer border
-                       hover:scale-[1.04] transition duration-200 bg-white"
+                        hover:scale-[1.04] transition duration-200 bg-white"
                 alt="thumbnail {{ $product->nama_produk }}"
               >
             </button>
@@ -105,7 +105,7 @@
 
 
     {{-- DETAIL PRODUK (SRS-04) --}}
-<div class="col-span-12 md:col-span-7 space-y-3">
+  <div class="col-span-12 md:col-span-7 space-y-3">
 
   {{-- KOTAK TOKO TERPISAH (di atas card) --}}
   <div class="inline-flex items-center gap-2 bg-white/85 backdrop-blur
@@ -153,13 +153,9 @@
     </p>
 
     {{-- BUTTON TAMBAH KOMENTAR --}}
-    <a 
-      href="#form-komentar"
-      class="inline-block mt-1 bg-pink-700 hover:bg-pink-800
-             text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition"
-    >
+    <button type="button" @click="openBiodata = true" class="inline-block mt-1 bg-pink-700 hover:bg-pink-800 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition">
       Tambah Komentar
-    </a>
+    </button>
 
     <hr class="border-gray-100 my-1">
 
@@ -177,11 +173,11 @@
         </div>
         </div>
     </div>
-</div>
-</div>
+  </div>
+  </div>
 
-{{-- ✅ KOMENTAR FULL WIDTH DI BAWAH --}}
-<div class="max-w-6xl mx-auto mt-10">
+  {{-- ✅ KOMENTAR FULL WIDTH DI BAWAH --}}
+  <div class="max-w-6xl mx-auto mt-10">
   <div class="bg-white/95 backdrop-blur p-6 rounded-2xl shadow-sm border border-white/60">
 
     <div class="flex items-center justify-between mb-4">
@@ -213,6 +209,60 @@
     @endforelse
 
   </div>
+  </div>
+
+    {{-- MODAL BIODATA --}}
+  <div
+    x-show="openBiodata"
+    x-transition
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+    style="display: none;"
+  >
+    <div
+      @click.outside="openBiodata = false"
+      class="bg-white rounded-2xl w-[90%] max-w-xl p-6 shadow-lg"
+    >
+      <h2 class="text-xl font-bold text-pink-700 text-center mb-4">
+        Harap masukkan biodata sebelum memberi komentar!
+      </h2>
+
+      <form action="{{ route('visitor.store', $product->id) }}" method="POST" class="space-y-3">
+        @csrf
+
+        <div>
+          <label class="text-sm font-semibold">Nama*</label>
+          <input name="nama_pengunjung" required
+            class="w-full border rounded-lg px-3 py-2 mt-1"
+            placeholder="Nama lengkap">
+        </div>
+
+        <div>
+          <label class="text-sm font-semibold">Nomor HP*</label>
+          <input name="nomor_hp" required
+            class="w-full border rounded-lg px-3 py-2 mt-1"
+            placeholder="08xxxxxxxxxx">
+        </div>
+
+        <div>
+          <label class="text-sm font-semibold">Email*</label>
+          <input name="email" required type="email"
+            class="w-full border rounded-lg px-3 py-2 mt-1"
+            placeholder="email@gmail.com">
+        </div>
+
+        <div class="flex justify-center pt-3">
+          <button type="submit"
+            class="bg-pink-600 hover:bg-pink-700 text-white px-5 py-2 rounded-lg font-semibold">
+            Lanjut Komentar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
 </div>
+
+
+
 
 @endsection

@@ -55,6 +55,9 @@ Route::get('/product/{id}', [DetailProductController::class, 'show'])
     ->name('product.detailProduct');
 
 // ========= REVIEW ROUTE =========
+Route::post('/produk/{product}/visitor', [ProductReviewController::class, 'storeVisitor'])
+    ->name('visitor.store');
+
 Route::get('/produk/{product}/komentar', [ProductReviewController::class, 'create'])
     ->name('reviews.create');
 
@@ -64,4 +67,11 @@ Route::post('/produk/{product}/komentar', [ProductReviewController::class, 'stor
 Route::get('/produk/{product}/komentar/sukses', [ProductReviewController::class, 'thanks'])
     ->name('reviews.thanks');
 
+Route::get('/test-email', function () {
+    \Illuminate\Support\Facades\Mail::raw('Tes email StudentPedia', function($m){
+        $m->to('emailkamu@gmail.com')->subject('Tes Email');
+    });
+
+    return 'sent';
+});
 require __DIR__.'/auth.php';
