@@ -22,18 +22,40 @@
             </div>
 
             {{-- USER ICON --}}
-            <a href="/profile" class="p-2">
-                <svg xmlns="http://www.w3.org/2000/svg"
-                    class="w-8 h-8 text-white"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="white" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M6 21v-1a6 6 0 0112 0v1" />
-                </svg>
-            </a>
+            {{-- USER ICON --}}
+            <div class="flex items-center space-x-3">
+                @guest
+                    {{-- Belum login → arahkan ke halaman login --}}
+                    <a href="{{ route('welcome') }}" class="p-2">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="w-8 h-8 text-white"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="white" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M6 21v-1a6 6 0 0112 0v1" />
+                        </svg>
+                    </a>
+                @else
+                    {{-- Sudah login → ke dashboard (nanti diarahkan sesuai role: seller/platform) --}}
+                    <a href="{{ route('dashboard') }}" class="p-2">
+                        
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="w-8 h-8 text-white"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="white" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M6 21v-1a6 6 0 0112 0v1" />
+                        </svg>
+                    </a>
+                @endguest
+            </div>
+
         </div>
     </header>
     @if (!isset($hideSearch) || !$hideSearch)

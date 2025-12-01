@@ -8,16 +8,30 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use App\Models\Seller;
 
 class ProfileController extends Controller
 {
     /**
      * Display the user's profile form.
      */
-    public function edit(Request $request): View
+    public function edit(Request $request): View|RedirectResponse
     {
+        $user = $request->user();
+
+        // Kalau user ini seller dan masih pending, lempar ke halaman pending
+        if ($user->role === 'seller') {
+            $seller = Seller::where('user_id', $user->id)->first();
+
+            if ($seller && $seller->status_verifikasi === 'pending') {
+                return redirect()->route('seller.pending')
+                    ->with('status', 'Akun Anda masih dalam proses verifikasi. Profil belum bisa diubah.');
+            }
+        }
+
+        // Selain itu (platform, atau seller yang sudah approved) tetap boleh edit profil
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
         ]);
     }
 
