@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 
+use App\Http\Controllers\ProductReviewController;
+
+
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Seller\DashboardSellerController;
 use App\Http\Controllers\SearchController;
@@ -23,6 +26,7 @@ use App\Models\Seller;
 | ROUTE WILAYAH (dari temenmu)
 |--------------------------------------------------------------------------
 */
+
 Route::get('/wilayah/provinsi', [WilayahController::class, 'provinsi']);
 Route::get('/wilayah/kabupaten/{kode}', [WilayahController::class, 'kabupaten']);
 Route::get('/wilayah/kecamatan/{kode}', [WilayahController::class, 'kecamatan']);
@@ -186,9 +190,32 @@ Route::get('/welcome', function () {
     return view('welcome');
 })->name('welcome');
 
+
+// ========= REVIEW ROUTE =========
+Route::post('product/{product}/visitor', [ProductReviewController::class, 'storeVisitor'])
+    ->name('visitor.store');
+
+Route::get('/produk/{product}/komentar', [ProductReviewController::class, 'create'])
+    ->name('reviews.create');
+
+Route::post('/produk/{product}/komentar', [ProductReviewController::class, 'store'])
+    ->name('reviews.store');
+
+Route::get('/produk/{product}/komentar/sukses', [ProductReviewController::class, 'thanks'])
+    ->name('reviews.thanks');
+
+/*Route::get('/test-email', function () {
+    \Illuminate\Support\Facades\Mail::raw('Tes email StudentPedia', function($m){
+        $m->to('emailkamu@gmail.com')->subject('Tes Email');
+    });
+
+    return 'sent';
+});*/
+
 /*
 |--------------------------------------------------------------------------
 | AUTH ROUTES (login, register, dll)
 |--------------------------------------------------------------------------
 */
+
 require __DIR__.'/auth.php';

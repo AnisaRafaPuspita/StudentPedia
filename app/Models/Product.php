@@ -43,10 +43,15 @@ class Product extends Model
         return $this->hasMany(Rating::class, 'product_id');
     }
 
-    // ⭐ relasi ke banyak foto (WAJIB ada)
+    // banyak foto
     public function images()
     {
         return $this->hasMany(\App\Models\ProductImage::class);
+    }
+
+    public function mainImage()
+    {
+        return $this->hasOne(\App\Models\ProductImage::class)->latestOfMany();
     }
 
     // ATTRIBUTE ---------------------------------------------------
@@ -56,14 +61,7 @@ class Product extends Model
         if ($this->ratings()->count() === 0) {
             return null;
         }
-        return round($this->ratings()->avg('rating'), 2);
-    }
-    /*public function images()
-    {
-        return $this->hasMany(ProductImage::class);
-    }*/
-    public function mainImage()
-    {
-        return $this->hasOne(ProductImage::class)->latestOfMany();
+
+        return round($this->ratings()->avg('rating') ?? 0, 2);
     }
 }

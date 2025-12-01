@@ -14,6 +14,9 @@ class Rating extends Model
     protected $fillable = [
         'product_id',
         'nama_pengunjung',
+        'email',
+        'nomor_hp',
+        'nama_provinsi',
         'komentar',
         'rating',
     ];
