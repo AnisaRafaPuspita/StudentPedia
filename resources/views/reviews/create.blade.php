@@ -19,7 +19,17 @@
                 <option value="{{ $i }}">{{ $i }}</option>
             @endfor
         </select>
-        @error('rating') <p class="text-red-500 text-sm">{{ $message }}</p> @enderror
+
+        @if ($errors->any())
+            <div class="text-red-600 text-sm mb-3">
+                <ul>
+                @foreach ($errors->all() as $error)
+                    <li>- {{ $error }}</li>
+                @endforeach
+                </ul>
+            </div>
+        @endif
+
 
         {{-- komentar --}}
         <label class="block font-semibold mb-1">Komentar</label>

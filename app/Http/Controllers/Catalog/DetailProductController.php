@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Catalog;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\Province;
 
 class DetailProductController extends Controller
 {
@@ -13,6 +14,8 @@ class DetailProductController extends Controller
         $product = Product::with(['images', 'mainImage', 'ratings', 'seller'])
             ->findOrFail($id);
 
-        return view('catalog.detailProduct', compact('product'));
+        $provinces = Province::orderBy('nama', 'asc')->get();
+
+        return view('catalog.detailProduct', compact('product','provinces'));
     }
 }

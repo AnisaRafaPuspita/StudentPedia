@@ -7,7 +7,7 @@
     <b>{{ $product->nama_produk }}</b>
 
     <p>Rating: ⭐ {{ $rating->rating }}</p>
-    <p>Komentar: "{{ $comment->komentar }}"</p>
+    <p>Komentar: "{{ $rating->komentar }}"</p>
 
     <br>
     <p>Salam hangat,</p>

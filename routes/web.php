@@ -55,7 +55,7 @@ Route::get('/product/{id}', [DetailProductController::class, 'show'])
     ->name('product.detailProduct');
 
 // ========= REVIEW ROUTE =========
-Route::post('/produk/{product}/visitor', [ProductReviewController::class, 'storeVisitor'])
+Route::post('product/{product}/visitor', [ProductReviewController::class, 'storeVisitor'])
     ->name('visitor.store');
 
 Route::get('/produk/{product}/komentar', [ProductReviewController::class, 'create'])

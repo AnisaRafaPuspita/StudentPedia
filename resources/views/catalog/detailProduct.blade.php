@@ -250,6 +250,21 @@
             placeholder="email@gmail.com">
         </div>
 
+        <div>
+          <label class="text-sm font-semibold">Provinsi*</label>
+          <select name="nama_provinsi" required class="w-full border rounded-lg px-3 py-2 mt-1">
+            <option value="">-- Pilih Provinsi --</option>
+            @foreach($provinces as $prov)
+              <option value="{{ $prov->nama }}">{{ $prov->nama }}</option>
+            @endforeach
+          </select>
+
+        @error('kode_provinsi')
+          <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+        @enderror
+      </div>
+
+
         <div class="flex justify-center pt-3">
           <button type="submit"
             class="bg-pink-600 hover:bg-pink-700 text-white px-5 py-2 rounded-lg font-semibold">

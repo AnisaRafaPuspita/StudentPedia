@@ -49,15 +49,12 @@ class Product extends Model
         }
         return round($this->ratings()->avg('rating')?? 0, 2);
     }
-    public function comments()
-    {
-        return $this->hasMany(Comment::class, 'product_id');
-    }
 
     public function images()
     {
         return $this->hasMany(ProductImage::class);
     }
+    
     public function mainImage()
     {
         return $this->hasOne(ProductImage::class)->latestOfMany();

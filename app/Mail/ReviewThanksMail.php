@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use App\Models\Rating;
-use App\Models\Comment;
 use App\Models\Product;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -15,7 +14,6 @@ class ReviewThanksMail extends Mailable
 
     public function __construct(
         public Rating $rating,
-        public Comment $comment,
         public Product $product
     ) {}
 
