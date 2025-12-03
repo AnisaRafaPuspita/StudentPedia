@@ -36,32 +36,31 @@ class DashboardSellerController extends Controller
 
         // === DATA GRAFIK 1: Sebaran stok per produk ===
         $stockChart = [
-            'labels' => $products->pluck('nama_produk')->values(),
-            'data'   => $products->pluck('stok')->values(),
+            'labels' => $products->pluck('nama_produk')->values()->all(),
+            'data'   => $products->pluck('stok')->values()->all(),
         ];
 
         // === DATA GRAFIK 2: Sebaran rata-rata rating per produk ===
         $ratingChart = [
-            'labels' => $products->pluck('nama_produk')->values(),
+            'labels' => $products->pluck('nama_produk')->values()->all(),
             'data'   => $products->map(function ($p) {
-                return $p->average_rating ?? 0;
-            })->values(),
+                return round($p->average_rating ?? 0, 2);
+            })->values()->all(),
         ];
 
-        // === DATA GRAFIK 3: Sebaran rating per provinsi ===
-        $ratings = Rating::with('product.seller.province')
-            ->whereHas('product', function ($q) use ($seller) {
+        // === DATA GRAFIK 3: Sebaran pemberi rating per provinsi (pengunjung) ===
+        $ratings = Rating::whereHas('product', function ($q) use ($seller) {
                 $q->where('seller_id', $seller->id);
             })
             ->get();
 
         $groupedByProvince = $ratings->groupBy(function ($rating) {
-            return optional(optional($rating->product)->seller->province)->nama ?? 'Tidak diketahui';
+            return $rating->nama_provinsi ?: 'Tidak diketahui';
         });
 
         $provinceChart = [
-            'labels' => $groupedByProvince->keys()->values(),
-            'data'   => $groupedByProvince->map->count()->values(),
+            'labels' => $groupedByProvince->keys()->values()->all(),
+            'data'   => $groupedByProvince->map->count()->values()->all(),
         ];
 
         return view('seller.dashboardPenjual', [
@@ -103,7 +102,6 @@ class DashboardSellerController extends Controller
             'stok'        => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
 
-            // ✅ multi file: minimal 1, tiap file harus image
             'gambar'      => 'required',
             'gambar.*'    => 'image|mimes:jpg,jpeg,png|max:2048',
         ]);
@@ -124,12 +122,11 @@ class DashboardSellerController extends Controller
             foreach ($request->file('gambar') as $index => $imageFile) {
                 $path = $imageFile->store('products', 'public');
 
-                // relasi hasMany ke ProductImage
                 $product->images()->create([
                     'path' => $path,
                 ]);
 
-                // foto pertama jadi gambar utama di tabel products
+                // foto pertama jadi gambar utama
                 if ($index === 0) {
                     $product->gambar = $path;
                     $product->save();
@@ -142,7 +139,7 @@ class DashboardSellerController extends Controller
             ->with('success', 'Produk berhasil diupload!');
     }
 
-    // FORM EDIT PRODUK (masih single image biasa)
+    // FORM EDIT PRODUK (MULTI FOTO)
     public function edit($id)
     {
         $seller = $this->getCurrentSeller();
@@ -151,7 +148,10 @@ class DashboardSellerController extends Controller
             abort(404, 'Seller tidak ditemukan.');
         }
 
-        $product = Product::where('seller_id', $seller->id)->findOrFail($id);
+        // load relasi images buat preview
+        $product = Product::where('seller_id', $seller->id)
+            ->with('images')
+            ->findOrFail($id);
 
         return view('seller.editProduct', [
             'seller'  => $seller,
@@ -159,7 +159,7 @@ class DashboardSellerController extends Controller
         ]);
     }
 
-    // UPDATE PRODUK (sementara masih 1 gambar)
+    // UPDATE PRODUK (MULTI FOTO)
     public function update(Request $request, $id)
     {
         $seller = $this->getCurrentSeller();
@@ -168,7 +168,9 @@ class DashboardSellerController extends Controller
             abort(404, 'Seller tidak ditemukan.');
         }
 
-        $product = Product::where('seller_id', $seller->id)->findOrFail($id);
+        $product = Product::where('seller_id', $seller->id)
+            ->with('images')
+            ->findOrFail($id);
 
         $validated = $request->validate([
             'nama_produk' => 'required|string|max:255',
@@ -176,24 +178,48 @@ class DashboardSellerController extends Controller
             'harga'       => 'required|integer|min:0',
             'stok'        => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
-            'gambar'      => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+
+            'gambar'      => 'nullable',
+            'gambar.*'    => 'image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        if ($request->hasFile('gambar')) {
-            if ($product->gambar && Storage::disk('public')->exists($product->gambar)) {
-                Storage::disk('public')->delete($product->gambar);
-            }
-
-            $product->gambar = $request->file('gambar')->store('products', 'public');
-        }
-
+        // update field teks dulu
         $product->nama_produk = $validated['nama_produk'];
         $product->deskripsi   = $validated['deskripsi'] ?? null;
         $product->harga       = $validated['harga'];
         $product->stok        = $validated['stok'];
         $product->category_id = $validated['category_id'];
-
         $product->save();
+
+        // kalau ada upload gambar baru → ganti semua gambar lama
+        if ($request->hasFile('gambar')) {
+            // hapus file gambar utama lama
+            if ($product->gambar && Storage::disk('public')->exists($product->gambar)) {
+                Storage::disk('public')->delete($product->gambar);
+            }
+
+            // hapus semua file & record di product_images
+            foreach ($product->images as $img) {
+                if ($img->path && Storage::disk('public')->exists($img->path)) {
+                    Storage::disk('public')->delete($img->path);
+                }
+                $img->delete();
+            }
+
+            // simpan gambar baru
+            foreach ($request->file('gambar') as $index => $imageFile) {
+                $path = $imageFile->store('products', 'public');
+
+                $product->images()->create([
+                    'path' => $path,
+                ]);
+
+                if ($index === 0) {
+                    $product->gambar = $path;
+                    $product->save();
+                }
+            }
+        }
 
         return redirect()
             ->route('seller.dashboard')
@@ -209,10 +235,20 @@ class DashboardSellerController extends Controller
             abort(404, 'Seller tidak ditemukan.');
         }
 
-        $product = Product::where('seller_id', $seller->id)->findOrFail($id);
+        $product = Product::where('seller_id', $seller->id)
+            ->with('images')
+            ->findOrFail($id);
 
+        // hapus semua gambar (utama + relasi)
         if ($product->gambar && Storage::disk('public')->exists($product->gambar)) {
             Storage::disk('public')->delete($product->gambar);
+        }
+
+        foreach ($product->images as $img) {
+            if ($img->path && Storage::disk('public')->exists($img->path)) {
+                Storage::disk('public')->delete($img->path);
+            }
+            $img->delete();
         }
 
         $product->delete();

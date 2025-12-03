@@ -30,7 +30,6 @@
         {{-- HEADER EDIT + PREVIEW FOTO --}}
         <div class="seller-upload-header">
             <div class="seller-upload-icon-box">
-                {{-- kalau ada gambar lama, tampilkan sebagai preview default --}}
                 @if($product->gambar)
                     <img id="edit-preview"
                          src="{{ asset('storage/' . $product->gambar) }}"
@@ -51,8 +50,19 @@
                 Ganti Foto
             </button>
             <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">
-                Pilih foto baru jika ingin mengganti. Biarkan kosong jika tidak ingin mengubah gambar.
+                Pilih satu atau lebih foto baru.
             </div>
+
+            {{-- thumbnail semua foto lama --}}
+            @if($product->images && $product->images->count())
+                <div class="mt-3" style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+                    @foreach($product->images as $img)
+                        <img src="{{ asset('storage/' . $img->path) }}"
+                             alt="Foto {{ $product->nama_produk }}"
+                             style="width:56px; height:56px; object-fit:cover; border-radius:10px; border:1px solid #F9A8D4;">
+                    @endforeach
+                </div>
+            @endif
         </div>
 
         {{-- ERROR VALIDATION --}}
@@ -72,12 +82,13 @@
             @csrf
             @method('PUT')
 
-            {{-- input file hidden (single image) --}}
+            {{-- input file hidden (MULTI IMAGE) --}}
             <input type="file"
                    id="input-gambar-edit"
-                   name="gambar"
+                   name="gambar[]"
                    class="d-none"
-                   accept="image/*">
+                   accept="image/*"
+                   multiple>
 
             <div class="seller-form-shell">
                 {{-- NAMA PRODUK --}}
@@ -159,12 +170,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!input) return;
 
     input.addEventListener('change', function (e) {
-        const file = e.target.files[0];
+        const file = e.target.files[0]; // tampilkan file pertama sebagai preview besar
 
-        if (!file) {
-            // kalau batal pilih file, jangan ubah preview lama
-            return;
-        }
+        if (!file) return;
 
         const reader = new FileReader();
         reader.onload = function (ev) {
