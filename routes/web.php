@@ -17,6 +17,7 @@ use App\Http\Controllers\SellerStatusController;
 use App\Http\Controllers\PlatformSellerController;
 use App\Http\Controllers\Catalog\CatalogController;
 use App\Http\Controllers\Catalog\DetailProductController;
+use App\Http\Controllers\DashboardPlatformController;
 
 use App\Mail\SellerApprovedMail;
 use App\Models\Seller;
@@ -51,7 +52,7 @@ Route::get('/dashboard', function () {
 
     // Kalau platform → lempar ke halaman verifikasi seller
     if ($user->role === 'platform') {
-        return redirect()->route('platform.sellers.index');
+        return redirect()->route('platform.dashboard');
     }
 
     // Kalau seller → cek status verifikasi
@@ -141,6 +142,8 @@ Route::middleware(['auth', 'role:platform'])
     ->prefix('platform')
     ->name('platform.')
     ->group(function () {
+        Route::get('/dashboard', [DashboardPlatformController::class, 'index'])
+            ->name('dashboard');
         Route::get('/sellers', [PlatformSellerController::class, 'index'])
             ->name('sellers.index');
 
