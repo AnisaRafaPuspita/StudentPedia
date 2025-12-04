@@ -8,6 +8,7 @@ use App\Models\Rating;
 use App\Models\Seller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class DashboardSellerController extends Controller
 {
@@ -257,4 +258,43 @@ class DashboardSellerController extends Controller
             ->route('seller.dashboard')
             ->with('success', 'Produk berhasil dihapus!');
     }
+
+        // EXPORT PDF: daftar produk yang stoknya < 2
+    public function exportLowStockPdf()
+    {
+        $seller = $this->getCurrentSeller();
+
+        if (! $seller) {
+            abort(404, 'Seller tidak ditemukan.');
+        }
+
+        // Ambil produk milik seller yang stok < 2
+        // diurutkan berdasarkan kategori dan nama produk
+        $products = Product::with('category')
+            ->where('seller_id', $seller->id)
+            ->where('stok', '<', 2) // kalau mau <= 2, ganti jadi '<='
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->orderBy('categories.nama')
+            ->orderBy('products.nama_produk')
+            ->select('products.*')
+            ->get();
+
+        if ($products->isEmpty()) {
+            return back()->with('info', 'Tidak ada produk dengan stok kurang dari 2.');
+        }
+
+        $generatedAt = now();
+
+        $pdf = Pdf::loadView('seller.reports.low_stock', [
+            'seller'       => $seller,
+            'products'     => $products,
+            'generated_at' => $generatedAt,
+            'user_name'    => optional($seller->user)->name ?? $seller->nama_toko,
+        ])->setPaper('A4', 'portrait');
+
+        $fileName = 'laporan-produk-segera-dipesan-'.$seller->nama_toko.'-'.$generatedAt->format('Ymd_His').'.pdf';
+
+        return $pdf->download($fileName);
+    }
+
 }

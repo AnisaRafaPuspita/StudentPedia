@@ -125,6 +125,15 @@
             <div class="bg-white rounded-2xl p-4 shadow-sm">
                 <h3 class="text-sm font-semibold text-pink-700 mb-2">Sebaran Stok per Produk</h3>
                 <canvas id="stockChart" height="180"></canvas>
+
+                {{-- Tombol export PDF: produk stok < 2 --}}
+                <div class="mt-3 flex justify-between items-center">
+                    {{-- KIRI: tombol laporan stok segera dipesan --}}
+                    <a href="{{ route('seller.products.export.lowstock') }}"
+                    class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-pink-50 text-pink-700 border border-pink-200 hover:bg-pink-100 transition">
+                        Export PDF – Produk stok &lt; 2
+                    </a>
+                </div>
             </div>
 
             {{-- Grafik 2 --}}

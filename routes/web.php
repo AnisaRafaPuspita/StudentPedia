@@ -130,6 +130,10 @@ Route::middleware(['auth', 'role:seller'])->group(function () {
     Route::get('/seller/products/create', [DashboardSellerController::class, 'create'])
         ->name('seller.products.create');
 
+    Route::get('/seller/products/export/low-stock', [DashboardSellerController::class, 'exportLowStockPdf'])
+        ->name('seller.products.export.lowstock');
+
+
 });
 
 /*
