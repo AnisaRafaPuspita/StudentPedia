@@ -17,6 +17,7 @@ use App\Http\Controllers\SellerStatusController;
 use App\Http\Controllers\PlatformSellerController;
 use App\Http\Controllers\Catalog\CatalogController;
 use App\Http\Controllers\Catalog\DetailProductController;
+use App\Http\Controllers\DashboardPlatformController;
 
 use App\Mail\SellerApprovedMail;
 use App\Models\Seller;
@@ -51,7 +52,7 @@ Route::get('/dashboard', function () {
 
     // Kalau platform → lempar ke halaman verifikasi seller
     if ($user->role === 'platform') {
-        return redirect()->route('platform.sellers.index');
+        return redirect()->route('platform.dashboard');
     }
 
     // Kalau seller → cek status verifikasi
@@ -86,6 +87,21 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/platform/export/keaktifan', 
+        [DashboardPlatformController::class, 'exportKeaktifan']
+    )->name('platform.export.keaktifan');
+
+    Route::get('/platform/export/kategori', 
+        [DashboardPlatformController::class, 'exportKategori']
+    )->name('platform.export.kategori');
+
+    Route::get('/platform/export/provinsi', 
+        [DashboardPlatformController::class, 'exportProvinsi']
+    )->name('platform.export.provinsi');
+
+    Route::get('/platform/export/rating', 
+        [DashboardPlatformController::class, 'exportRating']
+    )->name('platform.export.rating');
 
 });
 
@@ -141,6 +157,8 @@ Route::middleware(['auth', 'role:platform'])
     ->prefix('platform')
     ->name('platform.')
     ->group(function () {
+        Route::get('/dashboard', [DashboardPlatformController::class, 'index'])
+            ->name('dashboard');
         Route::get('/sellers', [PlatformSellerController::class, 'index'])
             ->name('sellers.index');
 
