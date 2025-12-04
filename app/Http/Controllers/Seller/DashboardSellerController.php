@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 
+
 class DashboardSellerController extends Controller
 {
     /**
@@ -88,7 +89,7 @@ class DashboardSellerController extends Controller
         ]);
     }
 
-    // SIMPAN PRODUK BARU (MULTI FOTO)
+    // SIMPAN PRODUK BARU (MULTI FOTO + KONDISI + MULTI VARIASI)
     public function store(Request $request)
     {
         $seller = $this->getCurrentSeller();
@@ -104,6 +105,14 @@ class DashboardSellerController extends Controller
             'stok'        => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
 
+            'kondisi'     => 'required|in:baru,bekas',
+
+            // variasi multi (opsional)
+            'variation_type'      => 'nullable|array',
+            'variation_type.*'    => 'nullable|in:warna,ukuran_sepatu,ukuran_baju',
+            'variation_value'     => 'nullable|array',
+            'variation_value.*'   => 'nullable|string|max:255',
+
             'gambar'      => 'required',
             'gambar.*'    => 'image|mimes:jpg,jpeg,png|max:2048',
         ]);
@@ -116,6 +125,7 @@ class DashboardSellerController extends Controller
             'deskripsi'   => $validated['deskripsi'] ?? null,
             'harga'       => $validated['harga'],
             'stok'        => $validated['stok'],
+            'kondisi'     => $validated['kondisi'],
             'gambar'      => null, // diisi nanti pakai foto pertama
         ]);
 
@@ -136,12 +146,27 @@ class DashboardSellerController extends Controller
             }
         }
 
+        // 3. Simpan VARIASI (bisa banyak baris)
+        $types  = $validated['variation_type']  ?? [];
+        $values = $validated['variation_value'] ?? [];
+
+        foreach ($types as $i => $type) {
+            $value = $values[$i] ?? null;
+
+            if ($type && $value) {
+                $product->variations()->create([
+                    'type'  => $type,
+                    'value' => $value,
+                ]);
+            }
+        }
+
         return redirect()
             ->route('seller.dashboard')
             ->with('success', 'Produk berhasil diupload!');
     }
 
-    // FORM EDIT PRODUK (MULTI FOTO)
+    // FORM EDIT PRODUK
     public function edit($id)
     {
         $seller = $this->getCurrentSeller();
@@ -150,9 +175,9 @@ class DashboardSellerController extends Controller
             abort(404, 'Seller tidak ditemukan.');
         }
 
-        // load relasi images buat preview
+        // load relasi images + variations buat preview / form
         $product = Product::where('seller_id', $seller->id)
-            ->with('images')
+            ->with(['images', 'variations'])
             ->findOrFail($id);
 
         return view('seller.editProduct', [
@@ -161,7 +186,7 @@ class DashboardSellerController extends Controller
         ]);
     }
 
-    // UPDATE PRODUK (MULTI FOTO)
+    // UPDATE PRODUK (MULTI FOTO + KONDISI + MULTI VARIASI)
     public function update(Request $request, $id)
     {
         $seller = $this->getCurrentSeller();
@@ -171,7 +196,7 @@ class DashboardSellerController extends Controller
         }
 
         $product = Product::where('seller_id', $seller->id)
-            ->with('images')
+            ->with(['images', 'variations'])
             ->findOrFail($id);
 
         $validated = $request->validate([
@@ -180,6 +205,13 @@ class DashboardSellerController extends Controller
             'harga'       => 'required|integer|min:0',
             'stok'        => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
+
+            'kondisi'     => 'required|in:baru,bekas',
+
+            'variation_type'      => 'nullable|array',
+            'variation_type.*'    => 'nullable|in:warna,ukuran_sepatu,ukuran_baju',
+            'variation_value'     => 'nullable|array',
+            'variation_value.*'   => 'nullable|string|max:255',
 
             'gambar'      => 'nullable',
             'gambar.*'    => 'image|mimes:jpg,jpeg,png|max:2048',
@@ -191,16 +223,18 @@ class DashboardSellerController extends Controller
         $product->harga       = $validated['harga'];
         $product->stok        = $validated['stok'];
         $product->category_id = $validated['category_id'];
+        $product->kondisi     = $validated['kondisi'];
         $product->save();
 
         // kalau ada upload gambar baru → ganti semua gambar lama
         if ($request->hasFile('gambar')) {
-            // hapus file gambar utama lama
+
+            // hapus gambar utama lama
             if ($product->gambar && Storage::disk('public')->exists($product->gambar)) {
                 Storage::disk('public')->delete($product->gambar);
             }
 
-            // hapus semua file & record di product_images
+            // hapus semua record & file di product_images
             foreach ($product->images as $img) {
                 if ($img->path && Storage::disk('public')->exists($img->path)) {
                     Storage::disk('public')->delete($img->path);
@@ -223,6 +257,23 @@ class DashboardSellerController extends Controller
             }
         }
 
+        // UPDATE VARIASI: hapus semua, isi ulang dari form
+        $product->variations()->delete();
+
+        $types  = $validated['variation_type']  ?? [];
+        $values = $validated['variation_value'] ?? [];
+
+        foreach ($types as $i => $type) {
+            $value = $values[$i] ?? null;
+
+            if ($type && $value) {
+                $product->variations()->create([
+                    'type'  => $type,
+                    'value' => $value,
+                ]);
+            }
+        }
+
         return redirect()
             ->route('seller.dashboard')
             ->with('success', 'Produk berhasil diperbarui!');
@@ -238,7 +289,7 @@ class DashboardSellerController extends Controller
         }
 
         $product = Product::where('seller_id', $seller->id)
-            ->with('images')
+            ->with(['images', 'variations'])
             ->findOrFail($id);
 
         // hapus semua gambar (utama + relasi)
@@ -253,6 +304,9 @@ class DashboardSellerController extends Controller
             $img->delete();
         }
 
+        // hapus variasi
+        $product->variations()->delete();
+
         $product->delete();
 
         return redirect()
@@ -260,80 +314,68 @@ class DashboardSellerController extends Controller
             ->with('success', 'Produk berhasil dihapus!');
     }
 
-// 1) PDF stok < 2 (laporan "segera dipesan")
-public function exportLowStockPdf()
-{
-    // samakan dengan helper milikmu; atau pakai Auth:
-    $user   = Auth::user();
-    $seller = Seller::where('user_id', $user->id)->firstOrFail();
+    // DOWNLOAD PDF (STOK / RATING)
+    public function downloadPdf(string $type)
+    {
+        $user   = Auth::user();
+        $seller = Seller::where('user_id', $user->id)->firstOrFail();
 
-    $products = Product::with('category')
-        ->where('seller_id', $seller->id)
-        ->where('stok', '<', 2) // ganti '<=' jika perlu
-        ->join('categories', 'products.category_id', '=', 'categories.id')
-        ->orderBy('categories.nama')
-        ->orderBy('products.nama_produk')
-        ->select('products.*')
-        ->get();
+        $productsBase = Product::with('category')
+            ->withAvg('ratings', 'rating')
+            ->where('seller_id', $seller->id);
 
-    if ($products->isEmpty()) {
-        return back()->with('info', 'Tidak ada produk dengan stok kurang dari 2.');
+        if ($type === 'stok') {
+            $products = $productsBase->orderByDesc('stok')->get();
+
+            $pdf = Pdf::loadView('seller.pdf.laporan_stok', [
+                'seller'   => $seller,
+                'products' => $products,
+            ])->setPaper('a4', 'portrait');
+
+            return $pdf->download('laporan-stok-produk.pdf');
+        }
+
+        if ($type === 'rating') {
+            $products = $productsBase->orderByDesc('ratings_avg_rating')->get();
+
+            $pdf = Pdf::loadView('seller.pdf.laporan_rating', [
+                'seller'   => $seller,
+                'products' => $products,
+            ])->setPaper('a4', 'portrait');
+
+            return $pdf->download('laporan-rating-produk.pdf');
+        }
+
+        abort(404);
     }
 
-    $generatedAt = now();
+    public function exportLowStockPdf()
+    {
+        $user   = Auth::user();
+        $seller = Seller::where('user_id', $user->id)->firstOrFail();
 
-    // kalau kamu sudah punya view khusus: seller.reports.low_stock
-    // kalau belum, sementara pakai seller.pdf.laporan_stok juga bisa
-    $pdf = Pdf::loadView('seller.pdf.laporan_stok', [
-        'seller'       => $seller,
-        'products'     => $products,
-        'generated_at' => $generatedAt,
-        'user_name'    => $user->name ?? $seller->nama_toko,
-    ])->setPaper('A4', 'portrait');
-
-    $fileName = 'laporan-produk-segera-dipesan-'.$seller->nama_toko.'-'.$generatedAt->format('Ymd_His').'.pdf';
-    return $pdf->download($fileName);
-}
-
-// 2) PDF untuk grafik: stok (urut stok) & rating (urut rata2 rating)
-public function downloadPdf(string $type)
-{
-    $user   = Auth::user();
-    $seller = Seller::where('user_id', $user->id)->firstOrFail();
-
-    $productsBase = Product::with('category')
-        ->withAvg('ratings', 'rating')
-        ->where('seller_id', $seller->id);
-
-    if ($type === 'stok') {
-        $products = $productsBase
-            ->orderByDesc('stok')
+        $products = Product::with('category')
+            ->where('seller_id', $seller->id)
+            ->where('stok', '<', 2) // ubah ke '<=' kalau mau
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->orderBy('categories.nama')
+            ->orderBy('products.nama_produk')
+            ->select('products.*')
             ->get();
+
+        if ($products->isEmpty()) {
+            return back()->with('info', 'Tidak ada produk dengan stok kurang dari 2.');
+        }
 
         $pdf = Pdf::loadView('seller.pdf.laporan_stok', [
             'seller'   => $seller,
             'products' => $products,
         ])->setPaper('a4', 'portrait');
 
-        return $pdf->download('laporan-stok-produk.pdf');
+        return $pdf->download(
+            'laporan-produk-segera-dipesan-'.$seller->nama_toko.'-'.now()->format('Ymd_His').'.pdf'
+        );
     }
-
-    if ($type === 'rating') {
-        $products = $productsBase
-            ->orderByDesc('ratings_avg_rating')
-            ->get();
-
-        $pdf = Pdf::loadView('seller.pdf.laporan_rating', [
-            'seller'   => $seller,
-            'products' => $products,
-        ])->setPaper('a4', 'portrait');
-
-        return $pdf->download('laporan-rating-produk.pdf');
-    }
-
-    abort(404);
-}
-
 
 }
 
