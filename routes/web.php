@@ -87,6 +87,21 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/platform/export/keaktifan', 
+        [DashboardPlatformController::class, 'exportKeaktifan']
+    )->name('platform.export.keaktifan');
+
+    Route::get('/platform/export/kategori', 
+        [DashboardPlatformController::class, 'exportKategori']
+    )->name('platform.export.kategori');
+
+    Route::get('/platform/export/provinsi', 
+        [DashboardPlatformController::class, 'exportProvinsi']
+    )->name('platform.export.provinsi');
+
+    Route::get('/platform/export/rating', 
+        [DashboardPlatformController::class, 'exportRating']
+    )->name('platform.export.rating');
 
 });
 

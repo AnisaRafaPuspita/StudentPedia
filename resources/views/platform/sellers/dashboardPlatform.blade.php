@@ -110,6 +110,31 @@
             opacity:.9;
         }
 
+        .btn-download{
+            position:relative; z-index:2;
+            background: var(--pink-bg); 
+            color: #fff !important;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 14px;
+            font-weight: 900;
+            font-size: 13px;
+            box-shadow: 0 10px 20px rgba(15,23,42,.18);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: .2s ease;
+        }
+        .btn-download:hover{
+            transform: translateY(-1px);
+            box-shadow: 0 14px 26px rgba(15,23,42,.22);
+        }
+        .btn-download svg{
+            width: 18px;
+            height: 18px;
+        }
+
+
         /* button glossy 1 warna */
         .btn-premium{
             position:relative; z-index:2;
@@ -331,10 +356,22 @@
             {{-- ROW ATAS: Keaktifan + Komentar/Rating --}}
             <div class="charts-top">
                 <div class="panel">
-                    <div class="panel-head">
-                        <div class="panel-title">Keaktifan Penjual</div>
-                        <div class="panel-sub">Approved = aktif, selain itu = tidak aktif</div>
+                    <div class="panel-head flex justify-between items-center">
+                        <div>
+                            <div class="panel-title">Keaktifan Penjual</div>
+                            <div class="panel-sub">Approved = aktif, selain itu = tidak aktif</div>
+                        </div>
+
+                        <a href="{{ route('platform.export.keaktifan') }}" class="btn-download mr-5">
+                            Download
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+                            </svg>
+                        </a>
                     </div>
+
                     <div class="panel-body">
                         <div class="chart-wrap-260">
                             <canvas id="chartKeaktifanSeller"
@@ -344,10 +381,23 @@
                 </div>
 
                 <div class="panel">
-                    <div class="panel-head">
-                        <div class="panel-title">Pengunjung memberi Komentar & Rating</div>
-                        <div class="panel-sub">Perbandingan total interaksi pengunjung</div>
+                    <div class="panel-head flex justify-between items-center">
+                        <div>
+                            <div class="panel-title">Pengunjung memberi Komentar & Rating</div>
+                            <div class="panel-sub">Perbandingan total interaksi pengunjung</div>
+                        </div>
+
+                        <a href="{{ route('platform.export.rating') }}" class="btn-download mr-5">
+                            Download
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+                            </svg>
+                        </a>
                     </div>
+                
+
                     <div class="panel-body">
                         <div class="chart-wrap-260">
                             <canvas id="chartRating"
@@ -356,13 +406,24 @@
                     </div>
                 </div>
             </div>
-
+            
             {{-- FULL: Produk per Kategori --}}
             <div class="panel chart-full">
-                <div class="panel-head">
-                    <div class="panel-title">Sebaran Jumlah Produk per Kategori</div>
-                    <div class="panel-sub">Akumulasi seluruh produk dari semua seller</div>
+                <div class="panel-head flex justify-between items-center">
+                    <div>
+                        <div class="panel-title">Sebaran Jumlah Stok Produk per Kategori</div>
+                    </div>
+
+                    <a href="{{ route('platform.export.kategori') }}" class="btn-download mr-5">
+                        Download
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+                        </svg>
+                    </a>
                 </div>
+
                 <div class="panel-body">
                     <div class="chart-wrap-300">
                         <canvas id="chartProdukKategori"
@@ -371,10 +432,22 @@
                 </div>
             </div>
 
+
             {{-- FULL: Provinsi --}}
             <div class="panel">
-                <div class="panel-head">
-                    <div class="panel-title">Sebaran Jumlah Toko per Provinsi</div>
+                <div class="panel-head flex justify-between items-center">
+                    <div>
+                        <div class="panel-title">Sebaran Jumlah Toko per Provinsi</div>
+                    </div>
+
+                    <a href="{{ route('platform.export.provinsi') }}" class="btn-download mr-4">
+                        Download
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+                        </svg>
+                    </a>
                 </div>
                 <div class="panel-body">
                     <div id="provinsiWrap" class="chart-wrap-provinsi">
