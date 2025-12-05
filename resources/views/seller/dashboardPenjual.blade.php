@@ -50,7 +50,6 @@
         </div>
 
         <div class="seller-header-right" style="display:flex; gap:14px; align-items:center;">
-            {{-- HANYA TOMBOL TAMBAH PRODUK --}}
             <a href="{{ route('seller.products.create') }}"
                class="btn-primary-pink"
                style="
@@ -76,7 +75,6 @@
             display:flex;
             gap:18px;
          ">
-        {{-- Card 1 --}}
         <div class="summary-card" style="flex:1;">
             <div class="summary-label">Total Produk Aktif</div>
             <div class="summary-value">{{ $products->count() }}</div>
@@ -85,14 +83,12 @@
             </div>
         </div>
 
-        {{-- Card 2 --}}
         <div class="summary-card" style="flex:1;">
             <div class="summary-label">Stok Keseluruhan</div>
             <div class="summary-value">{{ $products->sum('stok') }}</div>
             <div class="summary-help">Total stok dari semua produk aktif</div>
         </div>
 
-        {{-- Card 3 --}}
         <div class="summary-card" style="flex:1;">
             <div class="summary-label">Rata-rata Rating</div>
             @php
@@ -121,19 +117,28 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" style="margin-top:12px;">
-            {{-- Grafik 1 --}}
             <div class="bg-white rounded-2xl p-4 shadow-sm">
                 <h3 class="text-sm font-semibold text-pink-700 mb-2">Sebaran Stok per Produk</h3>
                 <canvas id="stockChart" height="180"></canvas>
+                <div class="mt-3 flex justify-end">
+                    <a href="{{ route('seller.grafik.pdf', 'stok') }}"
+                       class="px-3 py-1 rounded-lg border border-pink-500 text-pink-600 text-sm hover:bg-pink-50">
+                        Download PDF
+                    </a>
+                </div>
             </div>
 
-            {{-- Grafik 2 --}}
             <div class="bg-white rounded-2xl p-4 shadow-sm">
                 <h3 class="text-sm font-semibold text-pink-700 mb-2">Sebaran Rating per Produk</h3>
                 <canvas id="ratingChart" height="180"></canvas>
+                <div class="mt-3 flex justify-end">
+                    <a href="{{ route('seller.grafik.pdf', 'rating') }}"
+                       class="px-3 py-1 rounded-lg border border-pink-500 text-pink-600 text-sm hover:bg-pink-50">
+                        Download PDF
+                    </a>
+                </div>
             </div>
 
-            {{-- Grafik 3 --}}
             <div class="bg-white rounded-2xl p-4 shadow-sm">
                 <h3 class="text-sm font-semibold text-pink-700 mb-2">Pemberi Rating per Provinsi</h3>
                 <canvas id="provinceChart" height="180"></canvas>
@@ -153,11 +158,7 @@
 
             <div class="seller-products-filters">
                 <input type="text" class="seller-search" placeholder="Cari nama produk...">
-                <select class="seller-select">
-                    <option>Semua Status</option>
-                    <option>Aktif</option>
-                    <option>Stok Habis</option>
-                </select>
+                {{-- dropdown status dihapus --}}
             </div>
         </div>
 
@@ -184,6 +185,15 @@
                 @foreach($products as $product)
                     @php
                         $productRating = round($product->average_rating ?? 0, 1);
+
+                        $variationLabels = [
+                            'warna'         => 'Warna',
+                            'ukuran_sepatu' => 'Ukuran Sepatu',
+                            'ukuran_baju'   => 'Ukuran Baju',
+                        ];
+
+                        // group variasi berdasarkan type
+                        $variationGroups = $product->variations->groupBy('type');
                     @endphp
 
                     <div class="product-card">
@@ -199,15 +209,96 @@
                         @endif
 
                         <div class="product-card-body">
-                            <div class="product-name">
-                                {{ \Illuminate\Support\Str::limit($product->nama_produk, 40) }}
+                            {{-- NAMA PRODUK + KONDISI DI SAMPING --}}
+                            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:4px;">
+                                <div class="product-name" style="margin-bottom:0;">
+                                    {{ \Illuminate\Support\Str::limit($product->nama_produk, 40) }}
+                                </div>
+
+                                <div>
+                                    @if($product->kondisi === 'baru')
+                                        <span style="
+                                            background:#dcfce7;
+                                            color:#166534;
+                                            padding:2px 10px;
+                                            font-size:11px;
+                                            border-radius:999px;
+                                            border:1px solid #bbf7d0;
+                                            white-space:nowrap;
+                                        ">
+                                            Baru
+                                        </span>
+                                    @else
+                                        <span style="
+                                            background:#fff7cd;
+                                            color:#854d0e;
+                                            padding:2px 10px;
+                                            font-size:11px;
+                                            border-radius:999px;
+                                            border:1px solid #facc15;
+                                            white-space:nowrap;
+                                        ">
+                                            Bekas
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
 
-                            <div class="product-price">
-                                Rp {{ number_format($product->harga, 0, ',', '.') }}
+                            {{-- HARGA + VARIASI DALAM 1 BARIS --}}
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-top:4px;">
+                                <div>
+                                    <div class="product-price">
+                                        Rp {{ number_format($product->harga, 0, ',', '.') }}
+                                    </div>
+                                </div>
+
+                                <div style="min-width:90px; text-align:right;">
+                                    @if($variationGroups->isNotEmpty())
+                                        @foreach($variationGroups as $type => $rows)
+                                            <div style="margin-bottom:2px;">
+                                                <div style="font-size:10px; font-weight:600; color:#9f1239; margin-bottom:2px;">
+                                                    {{ $variationLabels[$type] ?? ucfirst(str_replace('_',' ',$type)) }}
+                                                </div>
+                                                <div style="display:flex; flex-wrap:wrap; gap:4px; justify-content:flex-end;">
+                                                    @foreach($rows as $row)
+                                                        <span style="
+                                                            border-radius:999px;
+                                                            border:1px solid #fecaca;
+                                                            background:#ffe4f5;
+                                                            padding:1px 7px;
+                                                            font-size:11px;
+                                                            color:#7f1d1d;
+                                                        ">
+                                                            {{ $row->value }}
+                                                        </span>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <div style="display:flex; justify-content:flex-end;">
+                                            <span style="
+                                                border-radius:999px;
+                                                border:1px dashed #fecaca;
+                                                background:#ffeef7;
+                                                padding:1px 8px;
+                                                font-size:11px;
+                                                color:#9f1239;
+                                                opacity:.8;
+                                            ">
+                                                Tanpa variasi
+                                            </span>
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
 
-                            <div class="product-meta-row">
+                            {{-- DESKRIPSI SINGKAT --}}
+                            <div style="font-size: 12px; color:#7f1d1d; margin-top:6px; min-height:32px;">
+                                {{ \Illuminate\Support\Str::limit($product->deskripsi, 80) }}
+                            </div>
+
+                            <div class="product-meta-row" style="margin-top:6px;">
                                 <div class="product-rating">
                                     ★ {{ number_format($productRating, 1) }}
                                     <span style="color:#9F1239;">
@@ -260,7 +351,6 @@
             const ratingChart   = @json($ratingChart);
             const provinceChart = @json($provinceChart);
 
-            // Grafik 1: Stok per produk
             new Chart(document.getElementById('stockChart'), {
                 type: 'bar',
                 data: {
@@ -279,7 +369,6 @@
                 }
             });
 
-            // Grafik 2: Rating per produk
             new Chart(document.getElementById('ratingChart'), {
                 type: 'bar',
                 data: {
@@ -298,7 +387,6 @@
                 }
             });
 
-            // Grafik 3: Pemberi rating per provinsi
             new Chart(document.getElementById('provinceChart'), {
                 type: 'pie',
                 data: {

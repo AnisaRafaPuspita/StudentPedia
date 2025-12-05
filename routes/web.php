@@ -230,6 +230,12 @@ Route::get('/produk/{product}/komentar/sukses', [ProductReviewController::class,
     return 'sent';
 });*/
 
+Route::get('/seller/dashboard/pdf/{type}',
+    [DashboardSellerController::class, 'downloadPdf']
+)->name('seller.grafik.pdf');
+
+
+
 /*
 |--------------------------------------------------------------------------
 | AUTH ROUTES (login, register, dll)
