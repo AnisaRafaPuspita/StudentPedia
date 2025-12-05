@@ -55,8 +55,7 @@ class Product extends Model
     {
         return $this->hasOne(ProductImage::class)->latestOfMany();
     }
-
-    // >>> banyak variasi per produk (S, M, L, warna, dsb)
+    
     public function variations()
     {
         return $this->hasMany(ProductVariation::class);
@@ -71,5 +70,16 @@ class Product extends Model
         }
 
         return round($this->ratings()->avg('rating') ?? 0, 2);
+    }
+
+    public function getCatalogImageUrlAttribute()
+    {
+        $image = $this->mainImage ?? $this->images->first();
+
+        if ($image) {
+            return asset('storage/'.$image->path);
+        }
+
+        return asset('img/default.jpg');
     }
 }

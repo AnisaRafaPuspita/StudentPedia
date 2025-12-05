@@ -10,9 +10,13 @@ class DetailProductController extends Controller
 {
     public function show($id)
     {
-        // Ambil produk + semua gambar + gambar utama + rating
-        $product = Product::with(['images', 'mainImage', 'ratings', 'seller'])
-            ->findOrFail($id);
+        $product = Product::with([
+                'images',
+                'mainImage',
+                'ratings.user',   
+                'seller',
+                'variations',
+            ])->findOrFail($id);
 
         $provinces = Province::orderBy('nama', 'asc')->get();
 
