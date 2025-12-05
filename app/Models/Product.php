@@ -55,8 +55,7 @@ class Product extends Model
     {
         return $this->hasOne(ProductImage::class)->latestOfMany();
     }
-   
-
+    
     // banyak variasi per produk (S, M, L, warna, dsb)
     public function variations()
     {
