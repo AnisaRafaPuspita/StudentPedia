@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\ProductVariation;
 
 class Product extends Model
 {
@@ -19,7 +18,6 @@ class Product extends Model
         'deskripsi',
         'harga',
         'stok',
-        'kondisi',
         'gambar',
     ];
 
@@ -28,7 +26,7 @@ class Product extends Model
         'stok'  => 'integer',
     ];
 
-    // ================= RELATIONSHIPS =================
+    // RELATIONSHIPS ---------------------------------------------
 
     public function seller()
     {
@@ -48,21 +46,15 @@ class Product extends Model
     // banyak foto
     public function images()
     {
-        return $this->hasMany(ProductImage::class);
+        return $this->hasMany(\App\Models\ProductImage::class);
     }
 
     public function mainImage()
     {
-        return $this->hasOne(ProductImage::class)->latestOfMany();
+        return $this->hasOne(\App\Models\ProductImage::class)->latestOfMany();
     }
 
-    // >>> banyak variasi per produk (S, M, L, warna, dsb)
-    public function variations()
-    {
-        return $this->hasMany(ProductVariation::class);
-    }
-
-    // ================= ACCESSOR / ATTRIBUTE ==============
+    // ATTRIBUTE ---------------------------------------------------
 
     public function getAverageRatingAttribute()
     {

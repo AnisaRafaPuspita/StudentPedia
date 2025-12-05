@@ -14,22 +14,21 @@
         :root {
             --pink-primary: #FF2D7A;
             --pink-soft: #FF5AA5;
-            --pink-bg: #FFE4F5;   /* soft pink background */
-            --grey-page: #FFE4F5; /* fullin soft pink untuk area tengah */
+            --pink-bg: #FFE0F0;
+            --grey-page: #FFD3EB;
             --grey-border: #F9A8D4;
             --text-main: #111827;
             --text-muted: #6B7280;
         }
 
-        /* ==== BACKGROUND HALAMAN ==== */
         body {
-            background: var(--grey-page); /* sekarang soft pink */
+            background: var(--grey-page);
         }
 
         .seller-page {
             min-height: 100vh;
             padding: 24px;
-            background: var(--grey-page); /* sama dengan body biar nyatu */
+            background: var(--grey-page);
         }
 
         .seller-container {
@@ -463,7 +462,7 @@
     </style>
 </head>
 
-<body class="min-h-screen flex flex-col"><!-- bg-pink-600 DIHAPUS -->
+<body class="bg-pink-600 min-h-screen flex flex-col">
 
     {{-- HEADER UMUM STUDENTPEDIA --}}
     <header class="bg-pink-400 text-white py-4 shadow">
