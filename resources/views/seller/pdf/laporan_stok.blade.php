@@ -44,7 +44,7 @@
             <tr>
                 <td class="no">{{ $i+1 }}</td>
                 <td class="text">{{ $p->nama_produk }}</td>
-                <td class="text">{{ $p->category->nama_kategori ?? '-' }}</td>
+                <td class="text">{{ $p->category->nama ?? '-' }}</td>
                 <td class="num">Rp {{ number_format($p->harga,0,',','.') }}</td>
                 <td class="num">{{ number_format($p->ratings_avg_rating ?? 0, 2) }}</td>
                 <td class="num">{{ $p->stok }}</td>
