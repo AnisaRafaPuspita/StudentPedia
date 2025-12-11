@@ -8,7 +8,6 @@ use App\Models\Rating;
 use App\Models\Seller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class DashboardSellerController extends Controller
 {
@@ -87,7 +86,7 @@ class DashboardSellerController extends Controller
         ]);
     }
 
-    // SIMPAN PRODUK BARU (MULTI FOTO + KONDISI + MULTI VARIASI)
+    // SIMPAN PRODUK BARU (MULTI FOTO)
     public function store(Request $request)
     {
         $seller = $this->getCurrentSeller();
@@ -103,14 +102,6 @@ class DashboardSellerController extends Controller
             'stok'        => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
 
-            'kondisi'     => 'required|in:baru,bekas',
-
-            // variasi multi (opsional)
-            'variation_type'      => 'nullable|array',
-            'variation_type.*'    => 'nullable|in:warna,ukuran_sepatu,ukuran_baju',
-            'variation_value'     => 'nullable|array',
-            'variation_value.*'   => 'nullable|string|max:255',
-
             'gambar'      => 'required',
             'gambar.*'    => 'image|mimes:jpg,jpeg,png|max:2048',
         ]);
@@ -123,7 +114,6 @@ class DashboardSellerController extends Controller
             'deskripsi'   => $validated['deskripsi'] ?? null,
             'harga'       => $validated['harga'],
             'stok'        => $validated['stok'],
-            'kondisi'     => $validated['kondisi'],
             'gambar'      => null, // diisi nanti pakai foto pertama
         ]);
 
@@ -144,27 +134,12 @@ class DashboardSellerController extends Controller
             }
         }
 
-        // 3. Simpan VARIASI (bisa banyak baris)
-        $types  = $validated['variation_type']  ?? [];
-        $values = $validated['variation_value'] ?? [];
-
-        foreach ($types as $i => $type) {
-            $value = $values[$i] ?? null;
-
-            if ($type && $value) {
-                $product->variations()->create([
-                    'type'  => $type,
-                    'value' => $value,
-                ]);
-            }
-        }
-
         return redirect()
             ->route('seller.dashboard')
             ->with('success', 'Produk berhasil diupload!');
     }
 
-    // FORM EDIT PRODUK
+    // FORM EDIT PRODUK (MULTI FOTO)
     public function edit($id)
     {
         $seller = $this->getCurrentSeller();
@@ -173,9 +148,9 @@ class DashboardSellerController extends Controller
             abort(404, 'Seller tidak ditemukan.');
         }
 
-        // load relasi images + variations buat preview / form
+        // load relasi images buat preview
         $product = Product::where('seller_id', $seller->id)
-            ->with(['images', 'variations'])
+            ->with('images')
             ->findOrFail($id);
 
         return view('seller.editProduct', [
@@ -184,7 +159,7 @@ class DashboardSellerController extends Controller
         ]);
     }
 
-    // UPDATE PRODUK (MULTI FOTO + KONDISI + MULTI VARIASI)
+    // UPDATE PRODUK (MULTI FOTO)
     public function update(Request $request, $id)
     {
         $seller = $this->getCurrentSeller();
@@ -194,7 +169,7 @@ class DashboardSellerController extends Controller
         }
 
         $product = Product::where('seller_id', $seller->id)
-            ->with(['images', 'variations'])
+            ->with('images')
             ->findOrFail($id);
 
         $validated = $request->validate([
@@ -203,13 +178,6 @@ class DashboardSellerController extends Controller
             'harga'       => 'required|integer|min:0',
             'stok'        => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
-
-            'kondisi'     => 'required|in:baru,bekas',
-
-            'variation_type'      => 'nullable|array',
-            'variation_type.*'    => 'nullable|in:warna,ukuran_sepatu,ukuran_baju',
-            'variation_value'     => 'nullable|array',
-            'variation_value.*'   => 'nullable|string|max:255',
 
             'gambar'      => 'nullable',
             'gambar.*'    => 'image|mimes:jpg,jpeg,png|max:2048',
@@ -221,18 +189,16 @@ class DashboardSellerController extends Controller
         $product->harga       = $validated['harga'];
         $product->stok        = $validated['stok'];
         $product->category_id = $validated['category_id'];
-        $product->kondisi     = $validated['kondisi'];
         $product->save();
 
         // kalau ada upload gambar baru → ganti semua gambar lama
         if ($request->hasFile('gambar')) {
-
-            // hapus gambar utama lama
+            // hapus file gambar utama lama
             if ($product->gambar && Storage::disk('public')->exists($product->gambar)) {
                 Storage::disk('public')->delete($product->gambar);
             }
 
-            // hapus semua record & file di product_images
+            // hapus semua file & record di product_images
             foreach ($product->images as $img) {
                 if ($img->path && Storage::disk('public')->exists($img->path)) {
                     Storage::disk('public')->delete($img->path);
@@ -255,23 +221,6 @@ class DashboardSellerController extends Controller
             }
         }
 
-        // UPDATE VARIASI: hapus semua, isi ulang dari form
-        $product->variations()->delete();
-
-        $types  = $validated['variation_type']  ?? [];
-        $values = $validated['variation_value'] ?? [];
-
-        foreach ($types as $i => $type) {
-            $value = $values[$i] ?? null;
-
-            if ($type && $value) {
-                $product->variations()->create([
-                    'type'  => $type,
-                    'value' => $value,
-                ]);
-            }
-        }
-
         return redirect()
             ->route('seller.dashboard')
             ->with('success', 'Produk berhasil diperbarui!');
@@ -287,7 +236,7 @@ class DashboardSellerController extends Controller
         }
 
         $product = Product::where('seller_id', $seller->id)
-            ->with(['images', 'variations'])
+            ->with('images')
             ->findOrFail($id);
 
         // hapus semua gambar (utama + relasi)
@@ -302,52 +251,10 @@ class DashboardSellerController extends Controller
             $img->delete();
         }
 
-        // hapus variasi
-        $product->variations()->delete();
-
         $product->delete();
 
         return redirect()
             ->route('seller.dashboard')
             ->with('success', 'Produk berhasil dihapus!');
-    }
-
-    // DOWNLOAD PDF (STOK / RATING)
-    public function downloadPdf($type)
-    {
-        $user = auth()->user();
-        $seller = Seller::where('user_id', $user->id)->firstOrFail();
-
-        $productsBase = Product::with('category')
-            ->withAvg('ratings', 'rating')
-            ->where('seller_id', $seller->id);
-
-        if ($type === 'stok') {
-            $products = $productsBase
-                ->orderByDesc('stok')
-                ->get();
-
-            $pdf = Pdf::loadView('seller.pdf.laporan_stok', [
-                'seller'   => $seller,
-                'products' => $products,
-            ]);
-
-            return $pdf->download('laporan-stok-produk.pdf');
-        }
-
-        if ($type === 'rating') {
-            $products = $productsBase
-                ->orderByDesc('ratings_avg_rating')
-                ->get();
-
-            $pdf = Pdf::loadView('seller.pdf.laporan_rating', [
-                'seller'   => $seller,
-                'products' => $products,
-            ]);
-
-            return $pdf->download('laporan-rating-produk.pdf');
-        }
-
-        abort(404);
     }
 }

@@ -28,9 +28,7 @@ class PlatformSellerController extends Controller
         ]);
 
         if ($seller->user && $seller->user->role !== 'seller') {
-            $seller->user->update([
-                'role' => 'seller',
-            ]);
+            $seller->user->update(['role' => 'seller']);
         }
 
         Mail::to($seller->email_pic)->send(new SellerApprovedMail($seller));
