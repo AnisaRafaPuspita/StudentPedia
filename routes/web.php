@@ -8,7 +8,7 @@ use App\Http\Controllers\ProductReviewController;
 
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Seller\DashboardSellerController;
+
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\WilayahController;
 use App\Http\Controllers\LocationController;
@@ -18,6 +18,9 @@ use App\Http\Controllers\PlatformSellerController;
 use App\Http\Controllers\Catalog\CatalogController;
 use App\Http\Controllers\Catalog\DetailProductController;
 use App\Http\Controllers\DashboardPlatformController;
+
+use App\Http\Controllers\Seller\DashboardSellerController;
+
 
 use App\Mail\SellerApprovedMail;
 use App\Models\Seller;
