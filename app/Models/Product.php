@@ -58,7 +58,7 @@ class Product extends Model
     
     public function variations()
     {
-        return $this->hasMany(ProductVariation::class);
+        return $this->hasMany(\App\Models\ProductVariation::class);
     }
 
     // ================= ACCESSOR / ATTRIBUTE ==============
