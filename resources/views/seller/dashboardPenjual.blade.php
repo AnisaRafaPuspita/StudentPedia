@@ -210,15 +210,10 @@
 
                     <div class="product-card">
                         {{-- FOTO BESAR --}}
-                        @if($product->gambar)
-                            <img src="{{ asset('storage/' . $product->gambar) }}"
-                                 alt="{{ $product->nama_produk }}"
-                                 style="width:100%; height:220px; object-fit:cover;">
-                        @else
-                            <img src="https://via.placeholder.com/400x260?text=No+Image"
-                                 alt="no image"
-                                 style="width:100%; height:220px; object-fit:cover;">
-                        @endif
+                        <img src="{{ $product->catalog_image_url }}"
+                            alt="{{ $product->nama_produk }}"
+                            style="width:100%; height:220px; object-fit:cover;">
+
 
                         <div class="product-card-body">
                             {{-- NAMA PRODUK + KONDISI DI SAMPING --}}

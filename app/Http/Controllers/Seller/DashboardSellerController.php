@@ -33,7 +33,7 @@ class DashboardSellerController extends Controller
         }
 
         // Ambil produk milik seller + relasi kategori & rating
-        $products = Product::with(['category', 'ratings'])
+        $products = Product::with(['category', 'ratings', 'images','mainImage'])
             ->where('seller_id', $seller->id)
             ->get();
 
