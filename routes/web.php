@@ -146,6 +146,10 @@ Route::middleware(['auth', 'role:seller'])->group(function () {
     Route::get('/seller/products/create', [DashboardSellerController::class, 'create'])
         ->name('seller.products.create');
 
+    Route::get('/seller/products/export/low-stock', [DashboardSellerController::class, 'exportLowStockPdf'])
+        ->name('seller.products.export.lowstock');
+
+
 });
 
 /*
@@ -234,6 +238,14 @@ Route::get('/seller/dashboard/pdf/{type}',
     [DashboardSellerController::class, 'downloadPdf']
 )->name('seller.grafik.pdf');
 
+// PDF stok < 2
+Route::get('/seller/laporan/stok-kritis', [DashboardSellerController::class, 'exportLowStockPdf'])
+    ->name('seller.products.export.lowstock');
+
+// PDF grafik (stok/rating)
+Route::get('/seller/grafik/pdf/{type}', [DashboardSellerController::class, 'downloadPdf'])
+    ->whereIn('type', ['stok', 'rating'])
+    ->name('seller.grafik.pdf');
 /*
 |--------------------------------------------------------------------------
 | AUTH ROUTES (login, register, dll)

@@ -125,12 +125,24 @@
             <div class="bg-white rounded-2xl p-4 shadow-sm">
                 <h3 class="text-sm font-semibold text-pink-700 mb-2">Sebaran Stok per Produk</h3>
                 <canvas id="stockChart" height="180"></canvas>
-                <div class="mt-3 flex justify-end">
-                    <a href="{{ route('seller.grafik.pdf', 'stok') }}"
-                    class="px-3 py-1 rounded-lg border border-pink-500 text-pink-600 text-sm hover:bg-pink-50">
-                        Download PDF
+                {{-- versi gabungan, hapus marker konflik --}}
+                <div class="mt-3 flex justify-between items-center">
+                    {{-- KIRI: laporan stok kritis (< 2) --}}
+                    <a href="{{ route('seller.products.export.lowstock') }}"
+                    class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-pink-50 text-pink-700 border border-pink-200 hover:bg-pink-100 transition">
+                    Export PDF – Produk stok &lt; 2
                     </a>
+
+                    {{-- KANAN: laporan stok (urut stok) / rating (urut rating) --}}
+                    <div class="flex gap-2">
+                        <a href="{{ route('seller.grafik.pdf', 'stok') }}"
+                        class="px-3 py-1 rounded-lg border border-pink-500 text-pink-600 text-xs hover:bg-pink-50">
+                        Download PDF (Stok)
+                        </a>
+                        
+                    </div>
                 </div>
+
             </div>
 
             {{-- Grafik 2 --}}

@@ -9,6 +9,7 @@ use App\Models\Seller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardSellerController extends Controller
 {
@@ -259,42 +260,81 @@ class DashboardSellerController extends Controller
             ->with('success', 'Produk berhasil dihapus!');
     }
 
-     public function downloadPdf($type)
-    {
-        $user = auth()->user();
-        $seller = Seller::where('user_id', $user->id)->firstOrFail();
+// 1) PDF stok < 2 (laporan "segera dipesan")
+public function exportLowStockPdf()
+{
+    // samakan dengan helper milikmu; atau pakai Auth:
+    $user   = Auth::user();
+    $seller = Seller::where('user_id', $user->id)->firstOrFail();
 
-        $productsBase = Product::with('category')
-            ->withAvg('ratings', 'rating')
-            ->where('seller_id', $seller->id);
+    $products = Product::with('category')
+        ->where('seller_id', $seller->id)
+        ->where('stok', '<', 2) // ganti '<=' jika perlu
+        ->join('categories', 'products.category_id', '=', 'categories.id')
+        ->orderBy('categories.nama')
+        ->orderBy('products.nama_produk')
+        ->select('products.*')
+        ->get();
 
-        if ($type === 'stok') {
-            $products = $productsBase
-                ->orderByDesc('stok')
-                ->get();
-
-            $pdf = Pdf::loadView('seller.pdf.laporan_stok', [
-                'seller' => $seller,
-                'products' => $products,
-            ]);
-
-            return $pdf->download('laporan-stok-produk.pdf');
-        }
-
-        if ($type === 'rating') {
-            $products = $productsBase
-                ->orderByDesc('ratings_avg_rating')
-                ->get();
-
-            $pdf = Pdf::loadView('seller.pdf.laporan_rating', [
-                'seller' => $seller,
-                'products' => $products,
-            ]);
-
-            return $pdf->download('laporan-rating-produk.pdf');
-        }
-
-        abort(404);
+    if ($products->isEmpty()) {
+        return back()->with('info', 'Tidak ada produk dengan stok kurang dari 2.');
     }
 
+    $generatedAt = now();
+
+    // kalau kamu sudah punya view khusus: seller.reports.low_stock
+    // kalau belum, sementara pakai seller.pdf.laporan_stok juga bisa
+    $pdf = Pdf::loadView('seller.pdf.laporan_stok', [
+        'seller'       => $seller,
+        'products'     => $products,
+        'generated_at' => $generatedAt,
+        'user_name'    => $user->name ?? $seller->nama_toko,
+    ])->setPaper('A4', 'portrait');
+
+    $fileName = 'laporan-produk-segera-dipesan-'.$seller->nama_toko.'-'.$generatedAt->format('Ymd_His').'.pdf';
+    return $pdf->download($fileName);
 }
+
+// 2) PDF untuk grafik: stok (urut stok) & rating (urut rata2 rating)
+public function downloadPdf(string $type)
+{
+    $user   = Auth::user();
+    $seller = Seller::where('user_id', $user->id)->firstOrFail();
+
+    $productsBase = Product::with('category')
+        ->withAvg('ratings', 'rating')
+        ->where('seller_id', $seller->id);
+
+    if ($type === 'stok') {
+        $products = $productsBase
+            ->orderByDesc('stok')
+            ->get();
+
+        $pdf = Pdf::loadView('seller.pdf.laporan_stok', [
+            'seller'   => $seller,
+            'products' => $products,
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->download('laporan-stok-produk.pdf');
+    }
+
+    if ($type === 'rating') {
+        $products = $productsBase
+            ->orderByDesc('ratings_avg_rating')
+            ->get();
+
+        $pdf = Pdf::loadView('seller.pdf.laporan_rating', [
+            'seller'   => $seller,
+            'products' => $products,
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->download('laporan-rating-produk.pdf');
+    }
+
+    abort(404);
+}
+
+
+}
+
+
