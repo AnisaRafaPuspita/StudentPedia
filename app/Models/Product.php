@@ -57,7 +57,7 @@ class Product extends Model
     }
    
 
-    // >>> banyak variasi per produk (S, M, L, warna, dsb)
+    // banyak variasi per produk (S, M, L, warna, dsb)
     public function variations()
     {
         return $this->hasMany(ProductVariation::class);
