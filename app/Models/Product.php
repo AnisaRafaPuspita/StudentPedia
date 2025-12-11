@@ -53,6 +53,10 @@ class Product extends Model
     {
         return $this->hasOne(\App\Models\ProductImage::class)->latestOfMany();
     }
+    public function variations()
+    {
+        return $this->hasMany(\App\Models\ProductVariation::class);
+    }
 
     // ATTRIBUTE ---------------------------------------------------
 
@@ -63,5 +67,16 @@ class Product extends Model
         }
 
         return round($this->ratings()->avg('rating') ?? 0, 2);
+    }
+
+    public function getCatalogImageUrlAttribute()
+    {
+        $image = $this->mainImage ?? $this->images->first();
+
+        if ($image) {
+            return asset('storage/'.$image->path);
+        }
+
+        return asset('img/default.jpg');
     }
 }
