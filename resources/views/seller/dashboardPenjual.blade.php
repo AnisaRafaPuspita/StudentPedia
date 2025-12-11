@@ -125,12 +125,24 @@
             <div class="bg-white rounded-2xl p-4 shadow-sm">
                 <h3 class="text-sm font-semibold text-pink-700 mb-2">Sebaran Stok per Produk</h3>
                 <canvas id="stockChart" height="180"></canvas>
+                <div class="mt-3 flex justify-end">
+                    <a href="{{ route('seller.grafik.pdf', 'stok') }}"
+                    class="px-3 py-1 rounded-lg border border-pink-500 text-pink-600 text-sm hover:bg-pink-50">
+                        Download PDF
+                    </a>
+                </div>
             </div>
 
             {{-- Grafik 2 --}}
             <div class="bg-white rounded-2xl p-4 shadow-sm">
                 <h3 class="text-sm font-semibold text-pink-700 mb-2">Sebaran Rating per Produk</h3>
                 <canvas id="ratingChart" height="180"></canvas>
+                <div class="mt-3 flex justify-end">
+                    <a href="{{ route('seller.grafik.pdf', 'rating') }}"
+                    class="px-3 py-1 rounded-lg border border-pink-500 text-pink-600 text-sm hover:bg-pink-50">
+                        Download PDF
+                    </a>
+                </div>
             </div>
 
             {{-- Grafik 3 --}}

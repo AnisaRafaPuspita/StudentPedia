@@ -8,6 +8,7 @@ use App\Models\Rating;
 use App\Models\Seller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class DashboardSellerController extends Controller
 {
@@ -257,4 +258,43 @@ class DashboardSellerController extends Controller
             ->route('seller.dashboard')
             ->with('success', 'Produk berhasil dihapus!');
     }
+
+     public function downloadPdf($type)
+    {
+        $user = auth()->user();
+        $seller = Seller::where('user_id', $user->id)->firstOrFail();
+
+        $productsBase = Product::with('category')
+            ->withAvg('ratings', 'rating')
+            ->where('seller_id', $seller->id);
+
+        if ($type === 'stok') {
+            $products = $productsBase
+                ->orderByDesc('stok')
+                ->get();
+
+            $pdf = Pdf::loadView('seller.pdf.laporan_stok', [
+                'seller' => $seller,
+                'products' => $products,
+            ]);
+
+            return $pdf->download('laporan-stok-produk.pdf');
+        }
+
+        if ($type === 'rating') {
+            $products = $productsBase
+                ->orderByDesc('ratings_avg_rating')
+                ->get();
+
+            $pdf = Pdf::loadView('seller.pdf.laporan_rating', [
+                'seller' => $seller,
+                'products' => $products,
+            ]);
+
+            return $pdf->download('laporan-rating-produk.pdf');
+        }
+
+        abort(404);
+    }
+
 }
