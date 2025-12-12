@@ -214,9 +214,9 @@
                     <div class="form-field">
                         <select name="category_id" class="seller-input" required>
                             <option value="">Pilih Kategori</option>
-                            <option value="1">Kecantikan</option>
+                            <option value="1">Elektronik</option>
                             <option value="2">Fashion</option>
-                            <option value="3">Elektronik</option>
+                            <option value="3">Kecantikan</option>
                             <option value="4">Rumah Tangga</option>
                             <option value="5">Sport</option>
                             <option value="6">Pendidikan</option>
