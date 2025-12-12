@@ -18,10 +18,19 @@ class DashboardSellerController extends Controller
      * Helper: ambil seller yang dipakai sekarang
      * (sementara pakai seller pertama di tabel sellers)
      */
-    private function getCurrentSeller()
+    
+
+    private function getCurrentSeller(): ?\App\Models\Seller
     {
-        return Seller::first(); // pastikan ada data di tabel sellers
+        $user = Auth::user();
+        if (!$user) {
+            return null;
+        }
+
+        // kalau kamu punya relasi hasOne di User -> seller, boleh pakai: return $user->seller;
+        return \App\Models\Seller::where('user_id', $user->id)->first();
     }
+
 
     // DASHBOARD PENJUAL
     public function index()
