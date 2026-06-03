@@ -10,10 +10,10 @@ class PlatformSeeder extends Seeder
     public function run(): void
     {
         User::updateOrCreate(
-            ['email' => 'admin@studentpedia.com'],
+            ['email' => 'anisarafa454@gmail.com'],
             [
                 'name' => 'Platform Admin',
-                'password' => Hash::make('admin123'),
+                'password' => Hash::make('admin1234'),
                 'role' => 'platform', // penting! sesuai middleware role:platform
             ]
         );
